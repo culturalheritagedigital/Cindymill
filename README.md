@@ -13,7 +13,7 @@ Cindymill is a DIY CNC milling machine. It is planned as a good introduction to 
 - Work area: 750 x 475 x 120 mm, can easily be adapted to other sizes.
 - Price: approx. 1500€/$.
 
-You will find all relevant information on [www.cindymill.xyz](www.cindymill.xyz).
+You will find all relevant information on [www.cindymill.xyz](http://www.cindymill.xyz).
 
 If you like the project you can tip me via [![Tip Me via PayPal](https://img.shields.io/badge/PayPal-tip%20me-green.svg?logo=paypal)](https://www.paypal.me/NikoPlath). Thanks. 
 
