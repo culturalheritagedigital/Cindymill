@@ -6,12 +6,12 @@
 Cindymill is a DIY CNC milling machine. It is planned as a good introduction to the world of milling. As you build the machine, you learn how it works. Cindymill is open source, so you can easily adapt it to your needs. The components are affordable, but the machine is rigid enough to comfortably mill aluminum (as well as wood and plastic, of course). 
 
 ## Short Specs
-- Ball screws SFU1605 on X and Y,  SFU1204 on Z
-- Extruded profile: based on 20x20 Item type 
+- Ball screws SFU1605 on X and Y,  SFU1204 on Z.
+- Extruded profile: based on 20x20 Item type.
 - Rails: MGN12
 - Motors: NEMA23
-- Work area: 750 x 475 x 120 mm, can easily be adapted to other sizes
-- Price: approx. 1500€/$
+- Work area: 750 x 475 x 120 mm, can easily be adapted to other sizes.
+- Price: approx. 1500€/$.
 
 You will find all relevant information on [www.cindymill.xyz](www.cindymill.xyz)
 
