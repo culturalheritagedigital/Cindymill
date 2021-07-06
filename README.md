@@ -1,3 +1,5 @@
+![Cindymill](cindymill_front_1.jpg)
+
 # Cindymill
 ## A gentle way to start CNC milling.
 
