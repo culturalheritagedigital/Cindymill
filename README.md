@@ -1,7 +1,7 @@
 ![Cindymill](cindymill_front_1.jpg)
 
 # Cindymill
-## A gentle way to start CNC milling.
+**A gentle way to start CNC milling.**
 
 Cindymill is a DIY CNC milling machine. It is planned as a good introduction to the world of milling. As you build the machine, you learn how it works. Cindymill is open source, so you can easily adapt it to your needs. The components are affordable, but the machine is rigid enough to comfortably mill aluminum (as well as wood and plastic, of course). 
 
