@@ -15,7 +15,7 @@ Cindymill is a DIY CNC milling machine. It is planned as a good introduction to 
 
 You will find all relevant information about parts and assembly here [www.cindymill.xyz](http://www.cindymill.xyz).
 
-Cite the project in academic context: <a href="https://zenodo.org/badge/latestdoi/382000048"><img src="https://zenodo.org/badge/382000048.svg" alt="DOI"></a>
+Cite the project in academics: <a href="https://doi.org/10.5281/zenodo.5118794"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.5118794.svg" alt="DOI"></a>
 
 If you like the project you can tip me via [![Tip Me via PayPal](https://img.shields.io/badge/PayPal-tip%20me-green.svg?logo=paypal)](https://www.paypal.me/NikoPlath). Thanks. 
 
