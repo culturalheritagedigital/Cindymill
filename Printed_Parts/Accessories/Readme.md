@@ -1,7 +1,7 @@
-## Tools
+## Accessories
 
-These tools help you to align the portal and Z axis rails.
+This section covers various (mostly printed) accessories which make the machine more convenient to use.
 
-![alignment_tools](alignment_tools.jpg)
+You will find descriptions about the individual parts here:
 
-[www.cindymill.xyz](http://www.cindymill.xyz)
+[http://www.cindymill.xyz/accessories](http://www.cindymill.xyz/addons)
