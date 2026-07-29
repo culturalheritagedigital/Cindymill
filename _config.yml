@@ -26,14 +26,6 @@ author:
 twitter_username: 
 github_username: culturalheritagedigital/cindymill
 logo: #/assets/icons/basically-basic-logo-light.svg
-search: false
-search_full_content: false
-search_provider: Lunr # algolia
-algolia:
-  application_id: #QB6HVGBSBA
-  index_name: #basically-basic
-  search_only_api_key: #9d5014e5bbc77372547bce778dfa5663
-  powered_by: # true (default), false
 
 google_analytics: G-EFN1CTB4WB
 
@@ -41,14 +33,24 @@ google_analytics: G-EFN1CTB4WB
 liquid:
   error_mode: strict
 
+# Sass (jekyll-sass-converter 3.x / sass-embedded)
+sass:
+  # Keine main.css.map ausliefern - sie war bisher oeffentlich abrufbar (218 KB).
+  sourcemap: never
+  # Das vendorte Theme (inkl. susy/breakpoint) nutzt @import, slash-div,
+  # lighten() und globale Sass-Builtins. Das sind Deprecations, keine Fehler:
+  # sie warnen auf Dart Sass 3.0 vor. Bis dahin wuerden sie jeden Build mit
+  # ~230 Zeilen Rauschen fluten und echte Meldungen verdecken.
+  # jekyll-sass-converter ~> 3.0 verlangt sass-embedded ~> 1.75 (< 2.0),
+  # der Bruch kann also nicht unbemerkt einziehen.
+  quiet_deps: true
+
 # Build settings
 markdown: kramdown
 
-#local
-theme: jekyll-theme-basically-basic
-
-# github pages
-#remote_theme: "mmistakes/jekyll-theme-basically-basic"
+# Kein theme:/remote_theme: - das Theme "basically-basic" 1.4.5 ist seit 2019
+# unmaintained und liegt seit AP 3.4 vendort im Repo (_layouts/, _sass/,
+# _includes/, assets/stylesheets/main.scss, assets/javascripts/main.js).
 
 plugins: # previously gems
   - jekyll-feed
@@ -73,10 +75,10 @@ exclude:
   - cindymill_front_1.jpg
   # Projektinterne Dokumentation
   - MODERNISIERUNG_UND_GITHUB_PAGES.md
-  - jekyll-theme-basically-basic.gemspec
   # Jekyll-Standardliste
   - Gemfile
   - Gemfile.lock
+  - .ruby-version
   - gemfiles/
   - node_modules/
   - vendor/bundle/
@@ -90,9 +92,6 @@ collections:
     output: true
     permalink: /:collection/:path/
   parts:
-    output: true
-    permalink: /:collection/:path/
-  gallery:
     output: true
     permalink: /:collection/:path/
 
@@ -113,12 +112,5 @@ defaults:
     values:
       layout: post
       read_time: true
-  # _gallery
-  - scope:
-      path: "_gallery"
-      type: gallery
-    values:
-      layout: post
-      read_time: false
 
 #copyright: <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
