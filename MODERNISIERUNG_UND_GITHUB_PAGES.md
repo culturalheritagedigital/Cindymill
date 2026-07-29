@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 30.07.2026 (Rev. 5 — AP 0, 1, 2 und 3 ausgeführt)
+**Stand:** 30.07.2026 (Rev. 6 — AP 0, 1, 2, 3 und 4 ausgeführt)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -139,15 +139,15 @@ Entscheidung: beides ersatzlos entfernen, Rechtstext entsprechend kürzen (AP 5)
 
 #### 🟠 G) Weitere Befunde
 
-- `legal_notice.md`: `href="www.cindymill.xyz"` ohne Schema → wird als relativer Pfad interpretiert, tot. Muss ohnehin auf die neue Adresse.
-- `assets/stylesheets/main.css.map` (218 KB) öffentlich abrufbar — unnötig.
-- Ungültiges HTML: `<meta name='ir-site-verification-token' value='276008534' />` — `value` statt `content`.
-- IE-Altlasten: `<meta http-equiv="X-UA-Compatible">`, „cut the mustard"-Script, `no-js`-Klasse.
-- Bilder ohne `loading="lazy"`, ohne `width`/`height` → Layout-Shift und langsames Laden.
-- Google Fonts (Fira Sans) vom Google-Server → DSGVO-Thema (LG München 2022) und Render-Blocking.
-- Lunr-Suchdateien werden ausgeliefert, obwohl `search: false` — tote Fracht.
-- `_config.yml` deklariert eine Collection `gallery`, ein Ordner `_gallery/` existiert nicht.
-- Auskommentierter `<video>`-Block in `gallery.md` (Zeile 591) — bleibt auskommentiert bzw. wird gelöscht (Inhalt wird nicht erweitert).
+- `legal_notice.md`: `href="www.cindymill.xyz"` ohne Schema → wird als relativer Pfad interpretiert, tot. Muss ohnehin auf die neue Adresse. ✅ Link behoben (AP 2), Fließtext offen (AP 5)
+- `assets/stylesheets/main.css.map` (218 KB) öffentlich abrufbar — unnötig. ✅ AP 3 (`sourcemap: never`)
+- Ungültiges HTML: `<meta name='ir-site-verification-token' value='276008534' />` — `value` statt `content`. ✅ AP 4
+- IE-Altlasten: `<meta http-equiv="X-UA-Compatible">`, „cut the mustard"-Script, `no-js`-Klasse. ✅ alle drei in AP 4 entfernt
+- Bilder ohne `loading="lazy"`, ohne `width`/`height` → Layout-Shift und langsames Laden. ✅ AP 4 (`_plugins/image_attributes.rb`)
+- Google Fonts (Fira Sans) vom Google-Server → DSGVO-Thema (LG München 2022) und Render-Blocking. ✅ AP 4 (self-hosted)
+- Lunr-Suchdateien werden ausgeliefert, obwohl `search: false` — tote Fracht. ✅ AP 3
+- `_config.yml` deklariert eine Collection `gallery`, ein Ordner `_gallery/` existiert nicht. ✅ AP 3
+- Auskommentierter `<video>`-Block in `gallery.md` (Zeile 591) — bleibt auskommentiert bzw. wird gelöscht (Inhalt wird nicht erweitert). ✅ AP 2 (Block gelöscht)
 
 #### 🟠 H) NEU (bei AP 2 gefunden): Icon-Pfade in `site.webmanifest` und `browserconfig.xml`
 
@@ -166,6 +166,34 @@ Ein lokal hinzugefügter Include (nicht Teil des Themes), der **von keiner Seite
 Der Eintrag `vendor/` aus AP 0 war **nicht verankert**. Git-Ignore-Muster ohne führenden Slash greifen auf *jeder* Ebene — der Eintrag war für Bundlers `vendor/bundle` gedacht, hätte aber auch `_sass/basically-basic/vendor/` erfasst: die 38 Sass-Dateien von **susy** und **breakpoint**, die das vendorte Theme zum Bauen braucht.
 
 Das ist die unangenehmste Fehlerklasse dieses Umzugs: **lokal wäre nichts aufgefallen** (die Dateien liegen ja im Arbeitsordner), erst der CI-Build hätte mit „Can't find stylesheet to import" abgebrochen — nach dem Push, ohne lokal reproduzierbar zu sein. Verifiziert mit `git check-ignore -v`, behoben durch Verankerung auf `/vendor/` und `/.bundle/`. `logs/`, `*.log` und `.htaccess` bleiben **bewusst unverankert**: sie sollen auf jeder Ebene greifen.
+
+#### 🟠 L) NEU (bei AP 4 gefunden): fünf Badges laden von Fremdservern
+
+Nach dem Self-Hosting der Schrift holt der Browser noch **vier Bilder von Fremdservern**, an fünf Stellen eingebunden — die einzigen verbliebenen Drittserver-Requests der Seite:
+
+| Host | Vorkommen | Wo |
+|---|---:|---|
+| `img.shields.io` (PayPal-Badge) | 2 | `index.html`, `files.md` |
+| `licensebuttons.net` (CC-Button) | 1 | `files.md` |
+| `i.creativecommons.org` (CC-Button) | 1 | `files.md` |
+| `zenodo.org` (DOI-Badge) | 1 | `index.html` |
+
+Es ist dieselbe Fehlerklasse, die AP 4 bei Google Fonts behoben hat: Der Aufruf einer fremden Ressource überträgt die Besucher-IP dorthin. Alle vier sind statische Bilder und ließen sich verlustfrei mit ausliefern (dann bekämen sie auch `width`/`height`, siehe AP 4). **Zugeordnet zu AP 5**, weil es eine Datenschutzentscheidung ist und nicht Aufräumarbeit — außerdem verlieren die Badges dabei ihre (hier ohnehin nie genutzte) Aktualisierbarkeit. Die Links selbst bleiben in jedem Fall unverändert.
+
+#### 🔴 M) KORREKTUR (bei AP 4 aufgefallen): der AP-3-Bericht hat 4 html-proofer-Fehler übersehen
+
+Der Ergebnisbericht zu AP 3 nennt „HTML-Proofer finished successfully". Beim Nachstellen des Commit-Stands `7efd49f` in einem eigenen Worktree (html-proofer 5.2.2, identische Kommandozeile) meldet derselbe Lauf **4 Fehler**:
+
+```
+http://creativecommons.org/licenses/by-nc-sa/4.0/ is not an HTTPS link
+  ./_site/files.html:323  (2x)
+  ./_site/index.html:301, 303
+→ HTML-Proofer found 4 failures!
+```
+
+Die vier Links standen schon vor AP 3 im Quelltext (`index.html`, `files.md`) und haben mit AP 2/AP 3 nichts zu tun — `enforce_https` ist in html-proofer 5 standardmäßig aktiv und greift auch unter `--disable-external`. Der AP-3-Bericht war an dieser Stelle also **zu optimistisch**; die dortige Kernaussage („die Seite bricht unter `/Cindymill` nicht") bleibt davon unberührt, denn kein einziger der vier Fehler ist ein Pfad- oder `baseurl`-Fehler.
+
+Behoben in AP 4 durch Umstellung auf `https://` (gleiches Ziel, Creative Commons liefert seit Jahren HTTPS). Lehre für AP 6: Im CI zählt der **Exit-Code**, nicht die letzte Zeile der Ausgabe.
 
 ### 1.4 Assets — neu vermessen
 
@@ -223,14 +251,15 @@ culturalheritagedigital/Cindymill (public)  ──►  GitHub Actions (Jekyll 4.
         │                                                                             │
    Root:   Jekyll-Quellcode                        culturalheritagedigital.github.io/Cindymill/
            + vendortes Theme                       HTTPS automatisch (*.github.io-Wildcard)
-           + optimierte assets/                    kein DNS, keine Domain, kein Zertifikatsthema
+           + optimierte assets/ (inkl. fonts/)     kein DNS, keine Domain, kein Zertifikatsthema
+           + _plugins/ (Bildmasse, nur mit Actions)
            + .github/workflows/
    model/: CAD-/Modelldaten (per exclude: nicht Teil des Builds)
    Root:   README.md, LICENSE, cindymill_front_1.jpg (ebenfalls excluded)
 ```
 
 **Warum GitHub Actions und nicht der klassische Pages-Jekyll-Build?**
-`jekyll-theme-basically-basic` steht **nicht** auf GitHubs Liste unterstützter Themes, und die Pages-Build-Umgebung ist auf Jekyll 3.9 festgenagelt. Mit einem Actions-Workflow läuft aktuelles Jekyll 4.4 mit beliebigen Gems.
+`jekyll-theme-basically-basic` steht **nicht** auf GitHubs Liste unterstützter Themes, und die Pages-Build-Umgebung ist auf Jekyll 3.9 festgenagelt. Mit einem Actions-Workflow läuft aktuelles Jekyll 4.4 mit beliebigen Gems. Seit AP 4 kommt ein zweiter, härterer Grund hinzu: Der klassische Pages-Build ignoriert `_plugins/` und würde die Bildmaße stillschweigend weglassen.
 
 **Kosten:** GitHub Pages ist für **öffentliche** Repositories kostenlos. Pages aus einem *privaten* Repo erfordert GitHub Pro/Team — das Repo muss also public sein. Bei einem CC-BY-NC-SA-Projekt ohnehin stimmig. **Laufende Kosten nach dem Umzug: 0 €** (Ionos-Webspace und Domain gekündigt).
 
@@ -447,9 +476,11 @@ Der **zweite Lauf ist der wichtige**: er beweist, dass AP 2 gehalten hat und die
 
 **Zwei Funde nebenbei:** der tote Include `image-gallery.html` (Befund I) und der leere Markdown-Link in `_parts/mechanical_parts.md` (Befund J) — letzterer war die einzige echte html-proofer-Meldung überhaupt. Und ein Fund, der ohne Prüfung erst im CI aufgeschlagen wäre: die **`.gitignore`-Falle** (Befund K) — `vendor/` unverankert hätte 38 der gerade vendorten Theme-Dateien aus dem Commit gehalten.
 
-**Offen aus AP 3:** nichts. Nicht Teil von AP 3 und weiterhin offen sind die Aufräumarbeiten, die die Planung AP 4/5 zuordnet — der GA4-Block und MathJax stehen noch in `_includes/head.html`, `google_analytics: G-EFN1CTB4WB` noch in `_config.yml`. Solange dieser Schlüssel gesetzt ist, zieht `_includes/scripts.html` unter `JEKYLL_ENV=production` zusätzlich `_includes/google-analytics.html` — beides fällt mit AP 4 weg. Ebenfalls noch da: die Google-Fonts-Einbindung über `_data/theme.yml` (`google_fonts: Fira Sans`), die AP 4 auf Self-Hosting umstellt.
+**Offen aus AP 3:** nichts. ✅ Die hier noch aufgeführten Reste — GA4-Block und MathJax in `_includes/head.html`, `google_analytics: G-EFN1CTB4WB` in `_config.yml`, die Google-Fonts-Einbindung über `_data/theme.yml` — sind mit **AP 4** erledigt.
 
-### AP 4 — `_config.yml` und `head.html` modernisieren
+> 🔴 **Korrektur zum html-proofer-Ergebnis dieses Arbeitspakets:** Die Läufe oben meldeten „finished successfully", tatsächlich fand html-proofer schon damals **4 Fehler**. Nachgestellt in AP 4 am Commit-Stand `7efd49f`. Siehe **Befund M**. Die Aussage, dass die Seite unter `/Cindymill` nicht bricht, bleibt gültig — keiner der vier Fehler ist ein Pfadfehler.
+
+### AP 4 — `_config.yml` und `head.html` modernisieren ✅ ausgeführt (30.07.2026)
 
 **`_config.yml`:**
 ```yaml
@@ -478,16 +509,102 @@ Damit werden `canonical`, `og:url`, `og:image`, `sitemap.xml` und `robots.txt` e
 - `width`/`height` an allen `<img>` setzen (verhindert Layout-Shift).
 - Nur falls WebP in AP 1.5 gewählt wurde: Galerie auf `<picture>` mit JPEG-Fallback umstellen.
 
+#### Ergebnis AP 4 (30.07.2026) — Commit `4ec0436`
+
+21 Dateien, +447/−57. Build und html-proofer laufen weiter durch, auch als Produktionsbuild.
+
+| # | Schritt | Ergebnis |
+|---|---|---|
+| 1 | `url` + `baseurl` | ✅ `https://culturalheritagedigital.github.io` + `/Cindymill` |
+| 2 | `google_analytics` aus `_config.yml` | ✅ entfernt, dazu der Produktions-Block in `_includes/scripts.html` und die Datei `_includes/google-analytics.html` |
+| 3 | MathJax-Block | ✅ ersatzlos gelöscht (beide `<script>`-Tags samt Konfiguration) |
+| 4 | GA4-Snippet `G-6J78SX32JE` | ✅ ersatzlos gelöscht |
+| 5 | `X-UA-Compatible` | ✅ gelöscht |
+| 6 | „Cut the mustard" | ✅ gelöscht, dazu `class="no-js"` in `_layouts/default.html` |
+| 7 | eBay-Verifizierung | ✅ `value=` → `content=` |
+| 8 | Google Fonts | ✅ self-hosted, 8 WOFF2 in `assets/fonts/` (228 KB) |
+| 9 | `rel="preload"` / kein `preconnect` | ✅ Regular-Schnitt vorgeladen; ein `preconnect` gab es nie |
+| 10 | Bild-Attribute in den Templates | ✅ per Plugin, siehe unten |
+| 11 | WebP / `<picture>` | ⬜ **entfällt** — WebP wurde in AP 1.5 nicht gewählt, es liegt keine einzige `.webp`-Datei im Projekt |
+
+**Die SEO-Metadaten sind erstmals gültig** (Befund C erledigt). Aus dem Build:
+
+```
+<link rel="canonical" href="https://culturalheritagedigital.github.io/Cindymill/" />
+og:url    → https://culturalheritagedigital.github.io/Cindymill/
+og:image  → https://culturalheritagedigital.github.io/Cindymill/assets/images/front.jpg
+sitemap   → <loc>https://culturalheritagedigital.github.io/Cindymill/assembly/…/</loc>
+robots    → Sitemap: https://culturalheritagedigital.github.io/Cindymill/sitemap.xml
+atom.xml  → self-Link und Einträge absolut
+```
+
+Damit ist `baseurl` jetzt **dauerhaft in `_config.yml`** gesetzt und nicht mehr nur ein `--baseurl`-Schalter beim Testen. Folge für alle künftigen Prüfläufe: html-proofer braucht immer `--swap-urls '^/Cindymill/:/'`, sonst hält es jeden korrekten Pfad für einen Fehler.
+
+**Analytics gegengeprüft — diesmal im Produktionsmodus.** Genau der Lauf, der in AP 3 die zweite ID zutage brachte, ist jetzt leer:
+
+```
+JEKYLL_ENV=production bundle exec jekyll build
+  → 0x G-6J78SX32JE, 0x G-EFN1CTB4WB, 0x googletagmanager, 0x google-analytics
+```
+
+**Schrift: Fira Sans liegt im Repo.** Die Einbindung über `fonts.googleapis.com` ist ersetzt durch `@font-face` in `_sass/cindymill/_fonts.scss` (neu, außerhalb des vendorten Themes):
+
+| Entscheidung | Begründung |
+|---|---|
+| 4 Schnitte × 2 Subsets = 8 Dateien | 400/400i/600/600i sind genau die Schnitte, die `_data/theme.yml` bisher bestellt hat — `$base-font-family` im Theme ist unverändert `"Fira Sans", sans-serif` |
+| `latin` **und** `latin-ext` | `unicode-range` trennt beide: `latin-ext` (134 KB) wird nur geladen, wenn ein Zeichen daraus vorkommt — im Repo kostet es Platz, beim Besucher nichts |
+| `font-display: swap` | Text ist sofort in der Systemschrift lesbar statt bis zu 3 s unsichtbar |
+| Pfade als `url('../fonts/…')` | relativ zum Ausgabeort von `main.css`, also **ohne** Liquid `baseurl`-fest — in Sass-Partials wird Liquid nicht ausgewertet |
+| `@use` statt `@import` für das neue Partial | hält die Deprecation-Liste bei 2 (siehe AP 3); die Zahl bleibt damit ein Maß für Theme-Altlasten, nicht für eigenen Code |
+| `assets/fonts/Fira_Sans-OFL.txt` liegt bei | Die SIL Open Font License 1.1 verlangt, dass der Lizenztext mitausgeliefert wird |
+
+Vorgeladen wird nur `fira-sans-normal-400-latin.woff2` — der Fließtextschnitt. Ein `preconnect` zu Google musste nicht entfernt werden: es war nie eines gesetzt.
+
+**Bild-Attribute: als Plugin, nicht als Textersetzung.** Die 181 `<img>` des Builds stammen aus drei Quellen — Markdown-Kurzschreibweise (95×), rohe `<img>`-Tags im Fließtext (74×) und Theme-Includes (`page-intro`, `entry`, `about`). Kein Suchen-und-Ersetzen erreicht alle drei. Entscheidender ist aber: `width`/`height` müssten sonst als **feste Zahlen im Inhalt** stehen und würden beim nächsten Neuskalieren eines Bildes still falsch. `_plugins/image_attributes.rb` liest sie stattdessen bei jedem Build aus der Datei:
+
+| Attribut | Vorkommen im Build |
+|---|---:|
+| `decoding="async"` | 181 / 181 |
+| `loading="lazy"` | 164 |
+| `loading="eager"` + `fetchpriority="high"` (Intro-Bild) | 17 |
+| `width` + `height` | **176** / 181 |
+
+Die fünf Bilder ohne Maße sind die Badges fremder Hosts — ihre Größe ist lokal nicht bekannt (neuer Befund L). Vorhandene Attribute werden nie überschrieben: `_includes/page-intro.html` setzt `loading="eager"`/`fetchpriority="high"` selbst, weil das Intro-Bild fast immer das LCP-Element ist. Drei Icons in `community.md`/`files.md` tragen im Quelltext ein `width="50"`/`width="75"` **ohne** Höhe — dort leitet das Plugin die fehlende Hälfte aus dem Seitenverhältnis der Datei ab (Discord-Logo 71×55 → `50×39`), denn erst das Paar verhindert den Layout-Shift.
+
+Ohne zusätzliches Gem: die Maße kommen aus den Dateiköpfen (JPEG-SOF-Marker, PNG-IHDR, GIF-Header, SVG `width`/`height` bzw. `viewBox`) — im Projekt gibt es nur diese vier Formate.
+
+> ⚠️ **Das Plugin bindet AP 6 fest an GitHub Actions.** Der klassische Pages-Jekyll-Build ignoriert `_plugins/` — dort fielen `loading`, `decoding` und alle Maße lautlos weg, ohne Fehlermeldung. Actions war ohnehin gesetzt (Jekyll 4.4, vendortes Theme), aber es ist jetzt keine Komfortentscheidung mehr.
+
+**Verifikation.**
+
+```
+bundle exec jekyll build                         → 27 Seiten, 2 Sass-Deprecations (unverändert)
+JEKYLL_ENV=production bundle exec jekyll build   → keine Analytics-ID
+bundle exec htmlproofer ./_site --disable-external --swap-urls '^/Cindymill/:/'
+  → 43 interne Links, 27 Dateien, HTML-Proofer finished successfully (Exit-Code 0)
+```
+
+Zusätzlich, weil „0 Fehler" allein nichts beweist (die Lehre aus Befund M):
+
+- **Alle 151 gemessenen Rasterbilder gegen `sips` gegengeprüft** — 0 Abweichungen zwischen den vom Plugin geschriebenen Maßen und den echten Pixelmaßen. Die drei SVG/Icon-Fälle einzeln nachgerechnet.
+- **`rel="preload"` wird von html-proofer geprüft** — Gegentest mit absichtlich falschem Dateinamen: „internally linking to … which does not exist". Ein Tippfehler im Font-Pfad fällt also im CI auf.
+- **Exit-Code beider Fälle geprüft:** 1 bei Fehlern, 0 ohne. Der Workflow in AP 6 kann sich darauf verlassen.
+- **`jekyll serve` gegengeprüft**, weil `url()` in CSS von keinem Prüfer erfasst wird: `/Cindymill/`, `main.css`, `fira-sans-normal-400-latin.woff2` (`font/woff2`) und ein Galeriebild antworten alle mit 200.
+- **Kein Mixed Content mehr:** 0 Treffer für `src="http://` und `href="http://` im gesamten Build.
+
+**Offen aus AP 4:** nichts. Weitergegeben an AP 5: die fünf Fremd-Badges (Befund L). Weitergegeben an AP 7.3: `README.md` enthält denselben `http://`-CC-Link — die Datei ist vom Build ausgeschlossen und wird dort ohnehin neu gefasst.
+
 ### AP 5 — Datenschutz & Rechtstexte
 
 Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses Paket erheblich.
 
-1. GA4-Snippet aus `_includes/head.html` **und** `google_analytics: G-EFN1CTB4WB` aus `_config.yml` entfernen (AP 4). Die zweite ID ist entgegen Rev. 4 **nicht** tot — sie würde im Produktionsbuild ausgeliefert, siehe Korrektur zu Befund E.
+1. ✅ **Erledigt in AP 4.** GA4-Snippet aus `_includes/head.html` **und** `google_analytics: G-EFN1CTB4WB` aus `_config.yml` entfernt, dazu der Produktions-Block in `_includes/scripts.html` und die Datei `_includes/google-analytics.html`. Die zweite ID war entgegen Rev. 4 **nicht** tot — sie wäre im Produktionsbuild ausgeliefert worden, siehe Korrektur zu Befund E. Gegengeprüft mit `JEKYLL_ENV=production`: keine ID im Build. Damit ist der technische Teil des Trackings weg; es bleibt der **Rechtstext**.
 2. `legal_notice.md` — **Analytics-Abschnitt streichen.** Er beschreibt Universal Analytics mit `_gat._anonymizeIp` und dem Opt-out-Browser-Add-on; beides existiert seit Juli 2023 nicht mehr und beschrieb ohnehin nie das, was lief.
 3. **Hosting-Angabe im Impressum** von Ionos auf **GitHub Inc.** ändern (Auftragsverarbeitung, US-Transfer). Ergänzen: GitHub Pages protokolliert Besucher-IP-Adressen — ein kurzer Absatz dazu gehört in die Datenschutzerklärung.
 4. **Alle Nennungen von `cindymill.xyz` ersetzen** (3 Stellen in `legal_notice.md`, u. a. „Internet address: www.cindymill.xyz" und die Verantwortlichen-Bezeichnung „the cindymill.xyz") durch `https://culturalheritagedigital.github.io/Cindymill/`.
    ✅ Geprüft: Die Kontakt-E-Mail lautet `cindymill@culturalheritage.digital` — **andere Domain, von der Kündigung nicht betroffen.**
-5. **Affiliate-Kennzeichnung prüfen:** 115× `amzn.to`, 102× `ebay.us`, 94× AliExpress-Links. Kennzeichnungspflicht besteht unabhängig vom Hosting. Ebenso die LinkedIn- und Facebook-Abschnitte auf Aktualität prüfen.
+5. **Fünf Fremd-Badges entscheiden (Befund L, neu aus AP 4).** `img.shields.io` (2×), `licensebuttons.net`, `i.creativecommons.org`, `zenodo.org` — die einzigen verbliebenen Drittserver-Requests der Seite, nachdem AP 4 die Google Fonts self-hosted hat. Empfehlung: die vier statischen Bilder mit ins Repo legen (`assets/images/badges/`), Links unverändert lassen. Dann ist die Seite frei von Drittserver-Aufrufen und die Badges bekommen `width`/`height` wie alle anderen Bilder.
+6. **Affiliate-Kennzeichnung prüfen:** 115× `amzn.to`, 102× `ebay.us`, 94× AliExpress-Links. Kennzeichnungspflicht besteht unabhängig vom Hosting. Ebenso die LinkedIn- und Facebook-Abschnitte auf Aktualität prüfen.
 6. Konsequenz aus dem Wegfall des Trackings: keine Cookies, kein Consent-Banner, keine Cookie-Richtlinie nötig.
 
 ### AP 6 — GitHub-Actions-Workflow
@@ -500,6 +617,12 @@ Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses
 - Repo-Einstellungen: **Settings → Pages → Source: GitHub Actions**
 
 `htmlproofer` im Build ist der wichtigste Teil — genau so wären die 73 Backslash-Links nie live gegangen, und genau so fällt ein `baseurl`-Fehler künftig sofort auf. Externe Links im CI ausschließen (`--ignore-status-codes` bzw. `--disable-external`), Laufzeit.
+
+**Drei Vorgaben aus AP 4, die der Workflow einhalten muss:**
+
+1. **`--swap-urls '^/Cindymill/:/'`** an `htmlproofer` übergeben. `baseurl` steht seit AP 4 dauerhaft in `_config.yml`; ohne den Schalter meldet jeder korrekte Pfad einen Fehler. Kein `--baseurl` am `build`-Aufruf nötig.
+2. **Kein `bundle exec jekyll build --safe`** und kein Rückfall auf den klassischen Pages-Build: beides ignoriert `_plugins/image_attributes.rb`, und zwar **ohne Fehlermeldung** — `loading`, `decoding` und alle Bildmaße fielen still weg.
+3. Der Exit-Code von `htmlproofer` ist verlässlich (1 bei Fehlern, 0 sonst, in AP 4 gegengeprüft). Er ist das Abbruchkriterium — **nicht** die letzte Zeile der Ausgabe, siehe Befund M.
 
 ### AP 7 — Livegang und Ionos-Kündigung (Reihenfolge einhalten!)
 
@@ -536,13 +659,15 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | 0 | 3–4 h | ✅ 913 MB → 62 MB |
 | 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | ✅ 199 Referenzen + 17 interne Links; html-proofer mit AP 3 nachgeholt: 0 Fehler |
 | 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | ✅ Build läuft, html-proofer 0 Fehler |
-| 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | offen |
-| 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | offen |
+| 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | ✅ SEO-Metadaten gültig, kein Tracking, Schrift self-hosted, Bildmaße im Build |
+| 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | offen (Punkt 1 mit AP 4 erledigt) |
 | 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | offen |
 | 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | offen |
 | 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h | offen |
 
 > **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
+
+**AP 4 hat die Reihenfolge nicht verschoben.** Es war Aufräumarbeit auf einem laufenden Build, wie angekündigt — mit einer Ausnahme: `baseurl` steht jetzt dauerhaft in `_config.yml`, und `_plugins/` ist entstanden. Beides bindet AP 6 auf zwei Vorgaben fest (siehe dort).
 
 **AP 1, 2 und 3 waren die kritischen Blocker** — ohne sie wäre der Umzug entweder unnötig teuer geworden (Größe), oder er hätte die kaputte Galerie zementiert und zusätzlich an allen absoluten Pfaden gebrochen. **Alle drei sind seit dem 30.07.2026 erledigt und gegen den gebauten `/Cindymill`-Unterpfad verifiziert.** Ab hier ist nichts mehr blockierend: AP 4–6 sind Aufräum- und Konfigurationsarbeit auf einem laufenden Build.
 
@@ -559,6 +684,8 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | ~~Jekyll 4.2 → 4.4 bricht das Theme~~ | ✅ **erledigt** | Eingetreten ist nur, was erwartet war: Sass-Deprecations, keine Fehler. Build und html-proofer laufen durch. |
 | ~~Sass-Build scheitert auf Ruby 3.4~~ | ✅ **erledigt** | `jekyll-sass-converter 3.1.0` mit `sass-embedded` — `sassc` ist raus. |
 | Dart Sass 3.0 entfernt `@import` und Slash-Division | mittel, aber nicht akut | Das vendorte Theme nutzt beides. In AP 3 bewusst nur stummgeschaltet (`quiet_deps`) statt migriert. Schutz: `jekyll-sass-converter ~> 3.0` verlangt `sass-embedded < 2.0`, der Bruch kann nicht per `bundle update` einziehen. Fällig wird die Migration erst, wenn eine neue Converter-Generation erscheint — dann via `sass-migrator`. |
+| **Eigenes Plugin wird von einer anderen Build-Umgebung ignoriert** | mittel, aber unsichtbar | `_plugins/image_attributes.rb` (AP 4) läuft nur beim Actions-Build. Der klassische Pages-Build und `--safe` überspringen es **ohne Fehlermeldung**: die Seite baut, sieht fast gleich aus, hat aber keine Bildmaße und kein Lazy-Loading mehr. Gegenmaßnahme: Vorgaben in AP 6 einhalten; als Dauerkontrolle taugt eine Zeile im Workflow, die `width=` im Build zählt. |
+| ~~Prüflauf meldet Erfolg, obwohl er Fehler gefunden hat~~ | ✅ **geklärt** | Befund M: Der AP-3-Bericht schrieb „0 Fehler", tatsächlich waren es 4. Ursache war die Auswertung der Ausgabe statt des Exit-Codes. Behoben, Exit-Code-Verhalten in AP 4 gegengeprüft, als Vorgabe in AP 6 verankert. |
 | `.gitignore`-Muster greifen tiefer als gedacht | niedrig, aber unsichtbar | Befund K: `vendor/` hätte 38 Theme-Dateien verschluckt, sichtbar erst im CI. Behoben. **Regel für künftige Einträge:** Werkzeug-Ordner auf den Root verankern (`/vendor/`), Sicherheitsmuster (`logs/`, `*.log`, `.htaccess`) absichtlich nicht. Neue Einträge mit `git check-ignore -v` gegenprüfen. |
 | Bild-Optimierung zerstört Bildqualität | niedrig | Originale liegen im Backup (nicht im Repo), Stichproben visuell prüfen |
 | Personenbezogene Daten im öffentlichen Repo | niedrig, aber gravierend | `logs/` liegt bereits nur im Backup; vor dem ersten Push manuell prüfen und Git-History kontrollieren |
@@ -590,9 +717,16 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] `main.css.map` wird nicht mehr ausgeliefert (`sass: sourcemap: never`)
 - [x] `.gitignore` verankert (`/vendor/`) — sonst wären 38 Theme-Dateien aus dem Commit gefallen
 - [ ] Algolia `search_only_api_key` im Algolia-Konto widerrufen (steht noch in der Git-Historie)
-- [ ] MathJax-Block gelöscht, GA4-Snippet gelöscht, Google Fonts self-hosted (Quelle: `_data/theme.yml`)
-- [ ] `url` + `baseurl: /Cindymill` gesetzt, sitemap/canonical/OG korrekt
+- [x] MathJax-Block gelöscht, GA4-Snippet gelöscht, Google Fonts self-hosted (Quelle: `_data/theme.yml`)
+- [x] `google_analytics` aus `_config.yml`, `scripts.html`-Block und `google-analytics.html` entfernt — Produktionsbuild trackt nicht
+- [x] IE-Altlasten raus (`X-UA-Compatible`, „cut the mustard", `no-js`), eBay-Tag `value=` → `content=`
+- [x] Fira Sans als 8 WOFF2 in `assets/fonts/` (OFL-Text dabei), `font-display: swap`, Regular per `rel=preload`
+- [x] `loading`/`decoding` an allen 181 `<img>`, `width`+`height` an 176 (`_plugins/image_attributes.rb`), Intro-Bild `fetchpriority="high"`
+- [x] Bildmaße gegen `sips` gegengeprüft: 151 Rasterbilder, 0 Abweichungen
+- [x] `url` + `baseurl: /Cindymill` gesetzt, sitemap/canonical/OG/robots/atom korrekt
+- [x] Kein Mixed Content mehr (4 CC-Lizenzlinks auf `https://`, Befund M)
 - [ ] Datenschutzerklärung: Analytics-Abschnitt raus, Hosting auf GitHub Inc., cindymill.xyz ersetzt
+- [ ] Fünf Fremd-Badges entschieden (Befund L: shields.io, licensebuttons.net, i.creativecommons.org, zenodo.org)
 - [ ] Affiliate-Kennzeichnung geprüft
 - [ ] GitHub-Actions-Workflow deployt, htmlproofer meldet 0 tote interne Links
 - [ ] Site unter `culturalheritagedigital.github.io/Cindymill/` vollständig durchgeklickt
