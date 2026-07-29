@@ -96,3 +96,7 @@ Put enough nuts for the backplate into the slots at the back of the profiles (5x
 ![image]({{ '/assets/images/assembly/assembly_portal12.jpg' | relative_url }})
 
 Continue with [Assembly of the Z Axis]({{ '/assembly/z_axis_assembly/' | relative_url }}).
+
+---
+
+This page contains affiliate links. If you use these links to buy something I may earn a commission at no additional cost to you, which helps me to maintain this website. Thanks.

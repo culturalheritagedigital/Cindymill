@@ -117,3 +117,7 @@ The spindle plate is the only part with countersinks so even if you plan to lase
 ![threads]({{ '/assets/images/threads.jpg' | relative_url }})
 
 [Back to Parts]({{ '/parts/' | relative_url }})
+
+---
+
+This page contains affiliate links. If you use these links to buy something I may earn a commission at no additional cost to you, which helps me to maintain this website. Thanks.

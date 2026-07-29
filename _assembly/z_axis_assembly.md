@@ -89,8 +89,12 @@ Required parts:
 Congratulations, you finished the mechanical part of your build! Grab a bear, take some photos, post them in our [facebook group](https://www.facebook.com/groups/3720520701339348){:target="_blank"}.
 
 If these instructions have helped you, I would appreciate a small donation that will help me maintain this website. Thanks!
-[![Tip Me via PayPal](https://img.shields.io/badge/PayPal-tip%20me-green.svg?logo=paypal)](https://www.paypal.me/NikoPlath){:target="_blank"} 
+[![Tip Me via PayPal]({{ '/assets/images/badges/paypal-tip-me.svg' | relative_url }})](https://www.paypal.me/NikoPlath){:target="_blank"} 
 
 ![image]({{ '/assets/images/assembly/assembly_zaxis7.jpg' | relative_url }})
 
 Continue with [Electronics]({{ '/assembly/electronics_assembly/' | relative_url }}).
+
+---
+
+This page contains affiliate links. If you use these links to buy something I may earn a commission at no additional cost to you, which helps me to maintain this website. Thanks.

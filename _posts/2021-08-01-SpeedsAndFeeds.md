@@ -168,3 +168,8 @@ These are cutters I use for **clearing pockets and contours** in wood, acrylic a
 
 | Part Name        |
 | Chamfer bit |      [Amazon](https://amzn.to/2TpJbnM){:target="_blank"}    |   [Aliexpress](https://s.click.aliexpress.com/e/_ALjXuG){:target="_blank"}    
+
+
+---
+
+This page contains affiliate links. If you use these links to buy something I may earn a commission at no additional cost to you, which helps me to maintain this website. Thanks.

@@ -27,7 +27,15 @@
 
       {% if page.introduction %}
         <div class="intro-more">
-          {{ page.introduction | markdownify }}
+          {%- comment -%}
+            Jekyll wertet in Front Matter kein Liquid aus - `introduction` kann
+            also kein `relative_url` enthalten. Asset-Pfade stehen darin deshalb
+            absolut (`/assets/...`) und bekommen den baseurl hier nachtraeglich,
+            genau wie die uebrigen Front-Matter-Pfade ueber ihre Includes. Ohne
+            das brechen sie unter `/Cindymill/` (AP 2, Befund D).
+          {%- endcomment -%}
+          {%- capture intro_asset_prefix -%}"{{ '/assets/' | relative_url }}{%- endcapture -%}
+          {{ page.introduction | markdownify | replace: '"/assets/', intro_asset_prefix }}
         </div>
       {% endif %}
 
