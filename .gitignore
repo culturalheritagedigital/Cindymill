@@ -1,0 +1,17 @@
+# Jekyll
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+
+# Bundler
+.bundle/
+vendor/
+
+# macOS
+.DS_Store
+
+# Ionos-Altlasten (dürfen nie ins öffentliche Repo)
+logs/
+*.log
+.htaccess

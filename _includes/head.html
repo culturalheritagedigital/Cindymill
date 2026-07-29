@@ -1,0 +1,69 @@
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% if site.plugins contains 'jekyll-seo-tag' or site.gems contains 'jekyll-seo-tag' %}
+    {% comment %}
+      Add metadata for search engines and social networks if jekyll-seo-tag plugin is enabled
+    {% endcomment %}
+    {% include head-seo.html %}
+  {% else %}
+    <title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
+    <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+    <link rel="canonical" href="{{ page.url | replace:'index.html', '' | absolute_url }}">
+  {% endif %}
+
+  <script>
+    /* Cut the mustard */
+    if ( 'querySelector' in document && 'addEventListener' in window ) {
+      document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + 'js';
+    }
+  </script>
+
+  <link rel="stylesheet" href="{{ '/assets/stylesheets/main.css' | relative_url }}">
+  {% if site.data.theme.google_fonts %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family={% for font in site.data.theme.google_fonts %}{{ font.name | replace: ' ', '+' }}{% if font.weights %}:{% endif %}{{ font.weights | remove: ' ' }}{% if forloop.last != true %}|{% endif %}{% endfor %}">
+  {% endif %}
+
+  {% if site.plugins contains 'jekyll-feed' or site.gems contains 'jekyll-feed'%}
+    {% comment %}
+      Add Atom feed link if jekyll-feed plugin is enabled
+    {% endcomment %}
+    {% include head-feed.html %}
+  {% endif %}
+
+  <!-- for mathjax support -->
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: "AMS" } }
+  });
+  </script>
+  <script type="text/javascript" async src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicons/favicon-16x16.png">
+  <link rel="manifest" href="/assets/images/favicons/site.webmanifest">
+  <link rel="mask-icon" href="/assets/images/favicons/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" href="/assets/images/favicons/favicon.ico">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-config" content="/assets/images/favicons/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- ebay verification tag -->
+  <meta name='ir-site-verification-token' value='276008534' />
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6J78SX32JE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-6J78SX32JE');
+  </script>
+
+
+</head>
