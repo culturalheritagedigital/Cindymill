@@ -1,5 +1,6 @@
-{% if jekyll.environment == 'production' and site.google_analytics %}
-  {% include google-analytics.html %}
-{% endif %}
-
+{% comment %}
+  Der Analytics-Block des Themes ist entfernt (AP 4). Er zog unter
+  JEKYLL_ENV=production _includes/google-analytics.html nach, sobald
+  site.google_analytics gesetzt war - der Actions-Workflow baut genau so.
+{% endcomment %}
 <script async src="{{ '/assets/javascripts/main.js' | relative_url }}"></script>

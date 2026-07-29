@@ -4,6 +4,11 @@
 
 @charset "utf-8";
 
+// Selbst ausgelieferte Schrift (AP 4). Steht vor dem Theme, damit die
+// @font-face-Regeln am Anfang von main.css landen. Bewusst @use statt
+// @import: Der Teil ist neu und soll die Deprecation-Liste nicht verlaengern.
+@use "cindymill/fonts";
+
 // Theme skin
 @import "basically-basic/themes/{{ site.data.theme.skin | default: 'default' }}";
 

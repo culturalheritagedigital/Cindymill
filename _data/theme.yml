@@ -20,10 +20,10 @@ t:
   min_read: "min read"
   present: "Present"
 
-# Google Fonts
-google_fonts:
-  - name: "Fira Sans"
-    weights: "400,400i,600,600i"
+# Keine Google Fonts: Fira Sans (400/400i/600/600i) liegt seit AP 4 als WOFF2
+# unter assets/fonts/ und wird per @font-face aus _sass/cindymill/_fonts.scss
+# eingebunden. Der Schluessel google_fonts wird bewusst nicht mehr gesetzt -
+# _includes/head.html wertet ihn nicht mehr aus.
 
 # Link to specific internal pages in the navigation.
 # Create a custom list to override the default setting of including links to all

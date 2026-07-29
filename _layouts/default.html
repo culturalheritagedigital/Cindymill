@@ -5,7 +5,7 @@
     Free for personal and commercial use under the MIT license
     https://github.com/mmistakes/jekyll-theme-basically-basic/blob/master/LICENSE
 -->
-<html lang="{{ page.lang | default: site.lang | default: 'en-US' }}" class="no-js">
+<html lang="{{ page.lang | default: site.lang | default: 'en-US' }}">
   {% include head.html %}
 
   <body class="layout--{{ page.layout | default: layout.layout }}{% if page.classes or layout.classes %}{{ page.classes | default: layout.classes | join: ' ' | prepend: ' ' }}{% endif %} {{ page.title | slugify }}">

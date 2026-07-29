@@ -17,8 +17,10 @@ lang: en-US
 title: Cindymill
 email: cindymill@culturalheritage.digital
 description: "A gentle way to start your journey into CNC milling."
-baseurl: ""  # the subpath of your site, e.g. /blog
-url: ""  # the base hostname & protocol for your site, e.g. http://example.com
+# Grosses C: GitHub Pages bildet den Repository-Namen unveraendert auf den
+# Pfad ab, /cindymill liefert 404.
+baseurl: "/Cindymill"
+url: "https://culturalheritagedigital.github.io"
 author:
   name: Niko Plath
   twitter: 
@@ -27,7 +29,9 @@ twitter_username:
 github_username: culturalheritagedigital/cindymill
 logo: #/assets/icons/basically-basic-logo-light.svg
 
-google_analytics: G-EFN1CTB4WB
+# Kein google_analytics: Die Seite trackt nicht. Waere der Schluessel gesetzt,
+# zoege _includes/scripts.html unter JEKYLL_ENV=production wieder
+# _includes/google-analytics.html nach (AP 4/5).
 
 # Liquid
 liquid:
@@ -113,4 +117,4 @@ defaults:
       layout: post
       read_time: true
 
-#copyright: <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+#copyright: <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
