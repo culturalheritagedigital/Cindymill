@@ -284,7 +284,7 @@ Alle 185 Asset-Referenzen in einem automatisierten Durchgang normalisieren (Befu
 
 > Der letzte Punkt ist der eigentliche Test dieses Arbeitspakets. Ohne ihn merkt man den `baseurl`-Bruch erst live.
 
-#### Ergebnis AP 2 (29.07.2026) — Commit `<AP2>`
+#### Ergebnis AP 2 (29.07.2026) — Commit `dc92a38`
 
 23 Dateien geändert, **199 Asset-Referenzen** plus **17 interne Seitenlinks** normalisiert.
 
