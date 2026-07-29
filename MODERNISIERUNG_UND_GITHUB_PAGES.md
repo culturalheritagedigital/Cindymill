@@ -252,7 +252,12 @@ Ziel: von 955,6 MB auf **< 50 MB**.
 6. **CAD-ZIPs (22 MB) bleiben im Repo** — bei 1 GB Pages-Limit unkritisch, und der Download-Link bleibt stabil. Alternative bei künftigem Wachstum: als GitHub **Release-Assets** ablegen (zählen nicht gegen das Pages-Limit).
 7. `main.css.map` nicht mehr ausliefern; Lunr-Dateien entfallen mit dem Vendoring (AP 3).
 
-**Kontrollwert nach AP 1:** ~50 MB, ~165 Dateien. Danach `git add assets/` und committen — vorher nicht.
+**Ergebnis AP 1 (29.07.2026):** `assets/` von 913 MB auf **62 MB**, 172 Dateien — davon 41 MB Bilder und 21 MB CAD-ZIPs. Commit `72ee937`.
+
+Das Ziel „< 50 MB" ist damit knapp verfehlt, dominiert vom 20-MB-CAD-ZIP. Bei 1 GB Pages-Limit ist das folgenlos; zwei Hebel bleiben, falls es doch stören sollte:
+
+- `2021_09_22_Cindymill_Complete_Model.zip` als **GitHub-Release-Asset** ablegen → Site fällt auf 41 MB (Release-Assets zählen nicht gegen das Pages-Limit).
+- Die fünf PNG-Renderings (`rend5`–`rend11`, zusammen ~6 MB) mit `pngquant` verlustbehaftet quantisieren → ca. 4 MB weniger.
 
 ### AP 2 — Asset-Pfade reparieren und `baseurl`-fest machen
 
@@ -270,7 +275,8 @@ Alle 185 Asset-Referenzen in einem automatisierten Durchgang normalisieren (Befu
 3. Gleiches für `_includes/head.html` (8 Referenzen) sowie `author.picture` und `logo` in `_config.yml`.
 4. Alle internen Seitenlinks (`href="/gallery.html"` o. ä.) ebenfalls auf `relative_url` prüfen — sie brechen unter `baseurl` genauso.
 5. `legal_notice.md`: `href="www.cindymill.xyz"` → neue Adresse (AP 5).
-6. Nach dem Build mit **html-proofer** verifizieren: 0 gebrochene interne Links.
+6. **Zwei vorbestehende tote Links in `gallery.md` beheben** (bei der Prüfung in AP 1 gefunden): `assets/images/gallery/milling1.mp4` und `assets/images/gallery/stuff1.jpg` existieren weder im Projekt noch im Ionos-Backup — sie waren schon live kaputt. Entweder Referenz entfernen oder auf eine vorhandene Datei zeigen lassen.
+7. Nach dem Build mit **html-proofer** verifizieren: 0 gebrochene interne Links.
 
 > Der letzte Punkt ist der eigentliche Test dieses Arbeitspakets. Ohne ihn merkt man den `baseurl`-Bruch erst live.
 
@@ -380,7 +386,7 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | # | Arbeitspaket | Abhängig von | Aufwand (grob) | Status |
 |---|---|---|---|---|
 | 0 | Repo anbinden, `model/`-Umbau, `.gitignore`, `gh` | — | 1 h | ✅ bis auf `gh auth login` und die Ionos-Vertragsdaten |
-| 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | 0 | 3–4 h | offen |
+| 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | 0 | 3–4 h | ✅ 913 MB → 62 MB |
 | 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | offen |
 | 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | offen |
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | offen |
@@ -422,9 +428,9 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] `gh` installiert
 - [ ] `gh auth login` ausgeführt
 - [ ] Ionos-Vertragsdaten/Zugänge gesichert
-- [ ] `_gallery_fancy.md` und `_about_us.md` (tote Entwürfe) gelöscht
-- [ ] 346 verwaiste Assets (708 MB) entfernt, alle 11 Videos gelöscht
-- [ ] Bilder optimiert → Site < 50 MB, danach `git add assets/`
+- [x] `_gallery_fancy.md` und `_about_us.md` (tote Entwürfe) gelöscht
+- [x] 340 verwaiste Assets (708 MB) entfernt, alle 11 Videos gelöscht
+- [x] 115 Bilder optimiert (183 MB gespart), `assets/` committet → 62 MB
 - [ ] 185 Asset-Referenzen auf `relative_url` normalisiert (73 Backslash + 106 absolut + 66 relativ)
 - [ ] Jekyll 4.4 + sass-embedded, Theme vendort, Build läuft lokal durch
 - [ ] MathJax-Block gelöscht, GA4-Snippet gelöscht, Google Fonts self-hosted
