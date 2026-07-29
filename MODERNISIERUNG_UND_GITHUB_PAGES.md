@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 29.07.2026 (Rev. 2)
+**Stand:** 29.07.2026 (Rev. 3 — AP 0 ausgeführt)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -11,7 +11,8 @@
 | Entscheidung | Konsequenz |
 |---|---|
 | **Inhalt bleibt 1:1 erhalten**, die Seite wird **nicht erweitert** | Rein technischer Umzug. Keine neuen Seiten, keine neuen Medien, kein Reaktivieren auskommentierter Inhalte (Videos, Suche). |
-| **Ionos-Webspace *und* Domain `cindymill.xyz` werden gekündigt** | Kein Custom-Domain-Setup, kein DNS, kein CNAME. Zieladresse ist dauerhaft `https://culturalheritagedigital.github.io/cindymill-website/`. Siehe Risiken. |
+| **Ionos-Webspace *und* Domain `cindymill.xyz` werden gekündigt** | Kein Custom-Domain-Setup, kein DNS, kein CNAME. Zieladresse ist dauerhaft `https://culturalheritagedigital.github.io/Cindymill/`. Siehe Risiken. |
+| **Die Website zieht in das bestehende Repo `culturalheritagedigital/Cindymill`** | Das Repo wird umgewidmet: Website im Root, Modelldaten im Unterordner `model/`. Sterne, Forks, Issues und die 54 Commits Historie bleiben erhalten. `baseurl` ist `/Cindymill` (Groß-/Kleinschreibung beachten). |
 | **Nicht genutzte Assets werden gelöscht** | 346 Dateien / 708 MB entfallen ersatzlos, inkl. **aller Videos**. |
 | **Google Analytics wird ersatzlos entfernt** | Keine Cookies, kein Consent-Banner, Analytics-Abschnitt der Datenschutzerklärung entfällt. |
 
@@ -43,7 +44,7 @@ Da Webspace und Domain gekündigt werden, ist an keinem dieser Punkte etwas zu r
 | `Gemfile.lock` | Plattform `x64-mingw32` | von Windows; muss auf macOS neu aufgelöst werden |
 | jekyll-algolia | im Gemfile | ungenutzt (`search: false`) — entfernen |
 
-Lokal: Ruby 3.4.1, Bundler 2.6.6. **`gh` (GitHub CLI) ist nicht installiert.** Der Ordner ist **kein Git-Repository**.
+Lokal: Ruby 3.4.1, Bundler 2.6.6, `gh` 2.96.0 (seit AP 0 installiert). Der Arbeitsordner ist seit AP 0 ein Klon von `culturalheritagedigital/Cindymill` auf dem Branch `website-migration`.
 
 > ⚠️ **Der Build läuft aktuell nicht.** Das Theme-Gem fehlt lokal, und damit fehlen `_layouts/` und `_sass/` komplett — im Projekt liegen nur 70 überschriebene `_includes/`. Der erste `bundle install` muss das Gem von rubygems.org holen, bevor überhaupt gebaut werden kann. Das ist zugleich die Voraussetzung für das Vendoring (AP 3.4).
 
@@ -96,9 +97,9 @@ In `_includes/head.html`, dadurch auf **allen 27 Seiten**:
 
 `sitemap.xml` enthält `<loc>/assembly/…/</loc>` (relativ = ungültig), `robots.txt` verweist auf `Sitemap: /sitemap.xml` (ungültig).
 
-#### 🔴 D) NEU: Absolute Asset-Pfade brechen unter dem `/cindymill-website/`-Unterpfad
+#### 🔴 D) NEU: Absolute Asset-Pfade brechen unter dem `/Cindymill/`-Unterpfad
 
-Weil die Domain entfällt, läuft die Seite unter einem **Projekt-Unterpfad** (`baseurl: "/cindymill-website"`). Damit werden alle Pfade der Form `/assets/…` und `../assets/…` ungültig — sie zeigen dann auf `culturalheritagedigital.github.io/assets/…` statt in das Projekt.
+Weil die Domain entfällt, läuft die Seite unter einem **Projekt-Unterpfad** (`baseurl: "/Cindymill"`). Damit werden alle Pfade der Form `/assets/…` und `../assets/…` ungültig — sie zeigen dann auf `culturalheritagedigital.github.io/assets/…` statt in das Projekt.
 
 Betroffen sind **185 Asset-Referenzen in 23 gebauten Quelldateien**:
 
@@ -186,12 +187,14 @@ Im Arbeitsordner sind sie bereits nicht mehr vorhanden — beim Anlegen des Repo
 ## 2. Zielarchitektur
 
 ```
-GitHub-Repo (public)  ──►  GitHub Actions (Jekyll 4.4 Build)  ──►  GitHub Pages
-        │                                                              │
-   Jekyll-Quellcode                          culturalheritagedigital.github.io/cindymill-website/
-   + vendortes Theme                         HTTPS automatisch (*.github.io-Wildcard)
-   + optimierte Assets                       kein DNS, keine Domain, kein Zertifikatsthema
-   + .github/workflows/
+culturalheritagedigital/Cindymill (public)  ──►  GitHub Actions (Jekyll 4.4)  ──►  GitHub Pages
+        │                                                                             │
+   Root:   Jekyll-Quellcode                        culturalheritagedigital.github.io/Cindymill/
+           + vendortes Theme                       HTTPS automatisch (*.github.io-Wildcard)
+           + optimierte assets/                    kein DNS, keine Domain, kein Zertifikatsthema
+           + .github/workflows/
+   model/: CAD-/Modelldaten (per exclude: nicht Teil des Builds)
+   Root:   README.md, LICENSE, cindymill_front_1.jpg (ebenfalls excluded)
 ```
 
 **Warum GitHub Actions und nicht der klassische Pages-Jekyll-Build?**
@@ -199,42 +202,41 @@ GitHub-Repo (public)  ──►  GitHub Actions (Jekyll 4.4 Build)  ──►  G
 
 **Kosten:** GitHub Pages ist für **öffentliche** Repositories kostenlos. Pages aus einem *privaten* Repo erfordert GitHub Pro/Team — das Repo muss also public sein. Bei einem CC-BY-NC-SA-Projekt ohnehin stimmig. **Laufende Kosten nach dem Umzug: 0 €** (Ionos-Webspace und Domain gekündigt).
 
-**Repo-Name = sichtbare URL.** Ohne eigene Domain wird der Repository-Name Teil der Adresse:
+**Repo-Name = sichtbare URL.** Ohne eigene Domain wird der Repository-Name Teil der Adresse. Entschieden: **das bestehende `culturalheritagedigital/Cindymill` wird umgewidmet** → `https://culturalheritagedigital.github.io/Cindymill/`.
 
-| Variante | Ergebnis-URL | Bewertung |
-|---|---|---|
-| neues Repo `cindymill-website` | `…github.io/cindymill-website/` | **empfohlen** — trennt Website-Pipeline sauber von den CAD-Daten |
-| Pages aus dem bestehenden `culturalheritagedigital/Cindymill` | `…github.io/Cindymill/` | kürzere URL, aber vermischt CAD-Repo, ~50 MB Website-Assets und Build-Pipeline |
-| Org-Site-Repo `culturalheritagedigital.github.io` | `…github.io/` | verbraucht den einmaligen Org-Root-Slot für ein einzelnes Projekt — nicht empfohlen |
+Das hat drei Konsequenzen, die im weiteren Plan berücksichtigt sind:
 
-Die Website verlinkt in allen Varianten weiterhin auf das bestehende CAD-Repo.
+1. **`baseurl: "/Cindymill"`** — mit großem C. GitHub Pages bildet den Repo-Namen unverändert auf den Pfad ab; ein kleingeschriebenes `/cindymill` liefert 404.
+2. **Die Modelldaten liegen jetzt unter `model/`.** Bestehende Links auf CAD-Dateien (Forks, Foren, das alte README) zeigen ins Leere und müssen umgebogen werden, soweit sie in eigener Hand sind. Die 14 Forks behalten die alte Struktur — das ist unvermeidbar.
+3. **Der Repo-Root ist die Jekyll-Wurzel.** Alles, was nicht zur Website gehört (`model/`, `README.md`, `LICENSE`, `cindymill_front_1.jpg`, die Projektdoku), muss in `_config.yml` unter `exclude:` stehen, sonst landet es im Build und im Pages-Deployment.
 
 ---
 
 ## 3. Arbeitspakete
 
-### AP 0 — Repository anlegen (Voraussetzung)
+### AP 0 — Repository vorbereiten ✅ weitgehend erledigt (29.07.2026)
 
-1. ✅ **Erledigt:** Vollbackup des Ionos-Webspace liegt in `2026_Backup_Website_Cindymill_Ionos`.
-   Ergänzen: Screenshots/Export der **Ionos-Vertragsdaten** (Paket, Domain-Auth-Code, Kündigungsfristen, Rechnungen) ins Backup legen — nach der Kündigung ist der Zugang weg.
-2. Arbeitsordner verifizieren: `logs/`, `.htaccess`, `_site/` und `.DS_Store` dürfen nicht eingecheckt werden. **Prüfen, nicht annehmen.**
-3. `git init`, Initial-Commit des unveränderten Zustands als Rollback-Punkt — **vor** der Asset-Diät, damit der Ausgangszustand einmal versioniert ist. Alternativ (empfohlen bei 955 MB): erst Diät, dann Initial-Commit — die gelöschten 708 MB lägen sonst dauerhaft in der Git-History und blähen jeden Clone auf.
-   → **Empfehlung: AP 1 vor dem Initial-Commit ausführen.** Das Backup ist der Rollback-Punkt.
-4. `.gitignore` anlegen:
-   ```
-   _site/
-   .jekyll-cache/
-   .sass-cache/
-   .bundle/
-   vendor/
-   .DS_Store
-   logs/
-   *.log
-   ```
-5. GitHub CLI installieren (`brew install gh`) oder Repo über die Weboberfläche anlegen.
-6. Repo `culturalheritagedigital/cindymill-website` **public** anlegen.
+| # | Schritt | Status |
+|---|---|---|
+| 1 | Vollbackup des Ionos-Webspace | ✅ `2026_Backup_Website_Cindymill_Ionos` (995 MB) |
+| 2 | Arbeitsordner auf Server-Artefakte prüfen | ✅ `logs/`, `.htaccess`, Rohlogs, `info.php5` etc. **nicht vorhanden**; 4× `.DS_Store` gelöscht |
+| 3 | `.gitignore` anlegen | ✅ inkl. `logs/`, `*.log`, `.htaccess`, `_site/`, `.DS_Store`, `vendor/`, `.bundle/` |
+| 4 | Bestehendes Repo anbinden statt neu initialisieren | ✅ `origin` = `culturalheritagedigital/Cindymill`, 54 Commits geholt (`.git` nur 11 MB) |
+| 5 | Arbeitsbranch `website-migration` | ✅ angelegt — `main` bleibt bis zum Livegang unangetastet |
+| 6 | Modelldaten nach `model/` verschieben | ✅ Commit `178fca3`, 81 Dateien, von Git als reine Renames erkannt (0 Insertions/Deletions) → Historie bleibt nachvollziehbar |
+| 7 | Website-Quellcode aufnehmen | ✅ Commit `74e6bbf`, 116 Dateien, **ohne `assets/`** |
+| 8 | `exclude:` in `_config.yml` setzen | ✅ `model/`, `README.md`, `LICENSE`, `cindymill_front_1.jpg`, Projektdoku + Jekyll-Standardliste |
+| 9 | GitHub CLI installieren | ✅ `gh` 2.96.0 via Homebrew |
+| 10 | `gh auth login` | ⬜ **offen — muss interaktiv ausgeführt werden** |
+| 11 | Ionos-Vertragsdaten sichern | ⬜ **offen** — Paket, Domain-Auth-Code, Kündigungsfristen, Rechnungen ins Backup. Nach der Kündigung ist der Zugang weg. |
 
-### AP 1 — Asset-Diät (Blocker, vor dem ersten Commit)
+**Wichtige Abweichung von Rev. 2:** Dort war ein frisches `git init` vorgesehen. Da die Website in das *bestehende* Repo zieht, wäre das falsch gewesen — es hätte die 54 Commits, die Sterne und die Forks verworfen. Stattdessen wurde das vorhandene Repo als `origin` angebunden und die Historie fortgeschrieben.
+
+**`assets/` fehlt bewusst im Commit.** Erst AP 1 ausführen, dann `git add assets/`. Andernfalls lägen die 708 MB verworfener Dateien dauerhaft in der Historie und jeder Clone — auch jeder der 14 Forks — zöge sie mit. Der Rollback-Punkt ist das Backup, nicht ein Initial-Commit.
+
+**Noch nicht gepusht.** Branch `website-migration` liegt nur lokal. Der Push ist der erste nach außen sichtbare Schritt und sollte erst erfolgen, wenn AP 1 durch ist — sonst ist ein Zwischenstand mit halb aufgeräumten Assets öffentlich.
+
+### AP 1 — Asset-Diät (Blocker, vor dem Commit von `assets/`)
 
 Ziel: von 955,6 MB auf **< 50 MB**.
 
@@ -250,14 +252,14 @@ Ziel: von 955,6 MB auf **< 50 MB**.
 6. **CAD-ZIPs (22 MB) bleiben im Repo** — bei 1 GB Pages-Limit unkritisch, und der Download-Link bleibt stabil. Alternative bei künftigem Wachstum: als GitHub **Release-Assets** ablegen (zählen nicht gegen das Pages-Limit).
 7. `main.css.map` nicht mehr ausliefern; Lunr-Dateien entfallen mit dem Vendoring (AP 3).
 
-**Kontrollwert nach AP 1:** ~50 MB, ~165 Dateien.
+**Kontrollwert nach AP 1:** ~50 MB, ~165 Dateien. Danach `git add assets/` und committen — vorher nicht.
 
 ### AP 2 — Asset-Pfade reparieren und `baseurl`-fest machen
 
 Alle 185 Asset-Referenzen in einem automatisierten Durchgang normalisieren (Befunde A und D):
 
 1. Alle `\` in Asset-Pfaden durch `/` ersetzen (73 live betroffene Vorkommen in `gallery.md`, `files.md`, `community.md`).
-2. Alle absoluten (`/assets/…`, 106×) und relativen (`../assets/…`, 66×) Pfade auf Jekyll-Filter umstellen — **zwingend**, weil die Seite unter `/cindymill-website/` läuft:
+2. Alle absoluten (`/assets/…`, 106×) und relativen (`../assets/…`, 66×) Pfade auf Jekyll-Filter umstellen — **zwingend**, weil die Seite unter `/Cindymill/` läuft:
    ```liquid
    {{ '/assets/images/gallery/frame/frame2.jpg' | relative_url }}
    ```
@@ -291,7 +293,7 @@ Alle 185 Asset-Referenzen in einem automatisierten Durchgang normalisieren (Befu
    - Lunr-Suchdateien und Algolia-Includes beim Kopieren weglassen (`search: false`).
    - Danach gibt es keine Abhängigkeit von einem toten Gem mehr, und AP 4 ist direkt umsetzbar.
 5. `jekyll-theme-basically-basic.gemspec` aus dem Projektroot löschen (Theme-Artefakt).
-6. Leere Collection `gallery` aus `_config.yml` entfernen (kein `_gallery/`-Ordner vorhanden).
+6. Leere Collection `gallery` aus `_config.yml` entfernen (kein `_gallery/`-Ordner vorhanden). Beim selben Durchgang den auskommentierten Algolia-Block entfernen — er enthält einen `search_only_api_key` im Klartext. Der Schlüssel ist zwar nur lesend und war ohnehin schon öffentlich, gehört aber nicht in ein Repo; bei der Gelegenheit im Algolia-Konto widerrufen.
 7. Erster Testlauf: `bundle install && bundle exec jekyll build` — Fehler der Anhebung 4.2 → 4.4 abarbeiten (v. a. Sass-Deprecations; `liquid: error_mode: strict` greift strenger).
 
 ### AP 4 — `_config.yml` und `head.html` modernisieren
@@ -299,9 +301,11 @@ Alle 185 Asset-Referenzen in einem automatisierten Durchgang normalisieren (Befu
 **`_config.yml`:**
 ```yaml
 url: "https://culturalheritagedigital.github.io"
-baseurl: "/cindymill-website"
+baseurl: "/Cindymill"      # großes C – GitHub Pages bildet den Repo-Namen
+                           # unverändert ab, /cindymill liefert 404
 google_analytics:          # entfernt, s. AP 5
 ```
+Die `exclude:`-Liste steht bereits (AP 0.8). Sie ist bei jedem neuen Root-Element im Repo nachzuziehen — Jekyll kopiert sonst alles Unbekannte ins `_site/`.
 Damit werden `canonical`, `og:url`, `og:image`, `sitemap.xml` und `robots.txt` erstmals korrekt absolut.
 
 > **`permalink` bleibt unverändert.** Rev. 1 schlug `permalink: pretty` vor, um die Extensionless-URLs des Apache nachzubilden. Mit der Aufgabe der Domain gibt es keine URLs mehr zu erhalten — jede Änderung wäre reines Risiko ohne Nutzen. `jekyll-redirect-from` entfällt damit ebenfalls.
@@ -328,7 +332,7 @@ Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses
 1. GA4-Snippet aus `_includes/head.html` und die tote ID `G-EFN1CTB4WB` aus `_config.yml` entfernen (AP 4).
 2. `legal_notice.md` — **Analytics-Abschnitt streichen.** Er beschreibt Universal Analytics mit `_gat._anonymizeIp` und dem Opt-out-Browser-Add-on; beides existiert seit Juli 2023 nicht mehr und beschrieb ohnehin nie das, was lief.
 3. **Hosting-Angabe im Impressum** von Ionos auf **GitHub Inc.** ändern (Auftragsverarbeitung, US-Transfer). Ergänzen: GitHub Pages protokolliert Besucher-IP-Adressen — ein kurzer Absatz dazu gehört in die Datenschutzerklärung.
-4. **Alle Nennungen von `cindymill.xyz` ersetzen** (3 Stellen in `legal_notice.md`, u. a. „Internet address: www.cindymill.xyz" und die Verantwortlichen-Bezeichnung „the cindymill.xyz") durch `https://culturalheritagedigital.github.io/cindymill-website/`.
+4. **Alle Nennungen von `cindymill.xyz` ersetzen** (3 Stellen in `legal_notice.md`, u. a. „Internet address: www.cindymill.xyz" und die Verantwortlichen-Bezeichnung „the cindymill.xyz") durch `https://culturalheritagedigital.github.io/Cindymill/`.
    ✅ Geprüft: Die Kontakt-E-Mail lautet `cindymill@culturalheritage.digital` — **andere Domain, von der Kündigung nicht betroffen.**
 5. **Affiliate-Kennzeichnung prüfen:** 115× `amzn.to`, 102× `ebay.us`, 94× AliExpress-Links. Kennzeichnungspflicht besteht unabhängig vom Hosting. Ebenso die LinkedIn- und Facebook-Abschnitte auf Aktualität prüfen.
 6. Konsequenz aus dem Wegfall des Trackings: keine Cookies, kein Consent-Banner, keine Cookie-Richtlinie nötig.
@@ -348,12 +352,13 @@ Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses
 
 Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 
-1. Workflow deployt erfolgreich → Site läuft unter `https://culturalheritagedigital.github.io/cindymill-website/`.
+1. Branch `website-migration` nach `main` mergen und pushen, Workflow deployt → Site läuft unter `https://culturalheritagedigital.github.io/Cindymill/`.
 2. **Vollständig durchklicken:** alle 27 Seiten, Galerie, beide CAD-Downloads, Blog-Paginierung, `atom.xml`, `404`. HTTPS ist über das `*.github.io`-Wildcard-Zertifikat automatisch aktiv — nichts zu konfigurieren.
 3. **Externe Verweise auf die alte Domain umbiegen**, solange sie noch erreichbar ist:
-   - README des CAD-Repos `culturalheritagedigital/Cindymill`
+   - `README.md` im Repo-Root — verlinkt aktuell `www.cindymill.xyz` und beschreibt nur die Maschine. Neu fassen: Website *und* Modelldaten unter `model/`, neuer Link auf die Pages-URL.
+   - das „Website"-Feld in den Repo-Einstellungen (zeigt auf `www.cindymill.xyz`)
    - eigene Profile, Foren-Signaturen, YouTube-Beschreibungen, Thingiverse/Printables-Einträge
-   - der Eintrag in der GitHub-Repo-Beschreibung („Website"-Feld)
+   - der Zenodo-DOI-Eintrag (`10.5281/zenodo.5118794`) verweist auf das Repo — Metadaten prüfen
 4. **Backup gegenprüfen:** Ist `2026_Backup_Website_Cindymill_Ionos` vollständig, und sind die Ionos-Vertrags-/Zugangsdaten gesichert (AP 0.1)? Nach der Kündigung ist beides nicht mehr abrufbar.
 5. **Erst danach bei Ionos kündigen:** Hosting-Paket **und** Domain `cindymill.xyz`. Kündigungsfrist und Vertragsende beachten — Ionos kündigt Domains üblicherweise zum Laufzeitende; bis dahin bleibt die alte Seite ggf. erreichbar.
 6. Nach Ablauf: Ionos-Zugangsdaten aus dem Passwortmanager entfernen bzw. archivieren.
@@ -363,7 +368,7 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 ### AP 8 — Nach dem Umzug
 
 1. `robots.txt` und `sitemap.xml` auf absolute URLs prüfen (ergibt sich aus AP 4).
-2. Google Search Console: neue Property für `https://culturalheritagedigital.github.io/cindymill-website/` anlegen, Sitemap einreichen. **Eine Adressänderung ist nicht möglich** (nur zwischen eigenen Properties, und die alte Domain wird aufgegeben) — die Suchmaschinen-Historie startet neu.
+2. Google Search Console: neue Property für `https://culturalheritagedigital.github.io/Cindymill/` anlegen, Sitemap einreichen. **Eine Adressänderung ist nicht möglich** (nur zwischen eigenen Properties, und die alte Domain wird aufgegeben) — die Suchmaschinen-Historie startet neu.
 3. Lighthouse-Messung (Performance/Accessibility/SEO/Best Practices) als Beleg.
 4. Externe Links prüfen: 115 Amazon-, 102 eBay-, 94 AliExpress-Links aus 2021 sind mit hoher Wahrscheinlichkeit größtenteils tot. `htmlproofer` mit externer Prüfung einmalig manuell laufen lassen. Tote Affiliate-Links sind auch rechtlich unschön.
 5. FTP-Spiegel und Rohlogs im Backup **verschlüsselt** ablegen oder die `logs/` daraus löschen — sie enthalten Besucher-IP-Adressen (AP 1.5).
@@ -372,19 +377,19 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 
 ## 4. Reihenfolge und Aufwand
 
-| # | Arbeitspaket | Abhängig von | Aufwand (grob) |
-|---|---|---|---|
-| 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | — | 3–4 h |
-| 0 | Git-Repo, `.gitignore`, GitHub-Repo anlegen | 1 | 1 h |
-| 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h |
-| 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h |
-| 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h |
-| 5 | Datenschutz/Rechtstexte | 4 | 1–2 h |
-| 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h |
-| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h |
-| 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h |
+| # | Arbeitspaket | Abhängig von | Aufwand (grob) | Status |
+|---|---|---|---|---|
+| 0 | Repo anbinden, `model/`-Umbau, `.gitignore`, `gh` | — | 1 h | ✅ bis auf `gh auth login` und die Ionos-Vertragsdaten |
+| 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | 0 | 3–4 h | offen |
+| 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | offen |
+| 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | offen |
+| 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | offen |
+| 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | offen |
+| 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | offen |
+| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | offen |
+| 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h | offen |
 
-> **AP 1 steht bewusst vor AP 0.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone zieht sie. Das Backup ist der Rollback-Punkt, ein Initial-Commit des Ausgangszustands ist dafür nicht nötig.
+> **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
 
 **AP 1, 2 und 3 sind die kritischen Blocker** — ohne sie ist der Umzug entweder unnötig teuer (Größe), oder er zementiert die kaputte Galerie und bricht zusätzlich an allen absoluten Pfaden.
 
@@ -403,25 +408,32 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | Bild-Optimierung zerstört Bildqualität | niedrig | Originale liegen im Backup (nicht im Repo), Stichproben visuell prüfen |
 | Personenbezogene Daten im öffentlichen Repo | niedrig, aber gravierend | `logs/` liegt bereits nur im Backup; vor dem ersten Push manuell prüfen und Git-History kontrollieren |
 | Kündigung vor funktionierendem Ersatz | niedrig | Reihenfolge in AP 7 strikt einhalten: erst Site live und geprüft, dann kündigen |
+| **Links auf CAD-Dateien brechen durch den `model/`-Umbau** | mittel | Folge der Umwidmung. Eigene Verweise (README, Website, Foren) mit umbiegen; die 14 Forks behalten die alte Struktur und sind nicht erreichbar. Der Umzug ist von Git als Rename erfasst, die Historie bleibt also nachvollziehbar. |
+| Repo-Root vermischt Website und Modelldaten | niedrig | `exclude:` in `_config.yml` hält `model/` aus dem Build; bei jedem neuen Root-Element nachziehen. `htmlproofer` im CI deckt Fehlkonfigurationen auf. |
 
 ---
 
 ## 6. Kurzcheckliste
 
 - [x] Backup Ionos-Webspace gezogen (`2026_Backup_Website_Cindymill_Ionos`)
+- [x] Arbeitsordner auf Server-Artefakte geprüft, `.gitignore` gesetzt
+- [x] Bestehendes Repo angebunden, Branch `website-migration`, Modelldaten nach `model/`
+- [x] Website-Quellcode committet (ohne `assets/`), `exclude:` gesetzt
+- [x] `gh` installiert
+- [ ] `gh auth login` ausgeführt
 - [ ] Ionos-Vertragsdaten/Zugänge gesichert
 - [ ] `_gallery_fancy.md` und `_about_us.md` (tote Entwürfe) gelöscht
 - [ ] 346 verwaiste Assets (708 MB) entfernt, alle 11 Videos gelöscht
-- [ ] Bilder optimiert → Site < 50 MB
-- [ ] Git-Repo angelegt, `logs/`/`_site/`/`.DS_Store` ausgeschlossen, History geprüft
+- [ ] Bilder optimiert → Site < 50 MB, danach `git add assets/`
 - [ ] 185 Asset-Referenzen auf `relative_url` normalisiert (73 Backslash + 106 absolut + 66 relativ)
 - [ ] Jekyll 4.4 + sass-embedded, Theme vendort, Build läuft lokal durch
 - [ ] MathJax-Block gelöscht, GA4-Snippet gelöscht, Google Fonts self-hosted
-- [ ] `url` + `baseurl: /cindymill-website` gesetzt, sitemap/canonical/OG korrekt
+- [ ] `url` + `baseurl: /Cindymill` gesetzt, sitemap/canonical/OG korrekt
 - [ ] Datenschutzerklärung: Analytics-Abschnitt raus, Hosting auf GitHub Inc., cindymill.xyz ersetzt
 - [ ] Affiliate-Kennzeichnung geprüft
 - [ ] GitHub-Actions-Workflow deployt, htmlproofer meldet 0 tote interne Links
-- [ ] Site unter `culturalheritagedigital.github.io/cindymill-website/` vollständig durchgeklickt
-- [ ] Externe Verweise auf cindymill.xyz umgebogen (CAD-Repo-README, Profile, Foren)
+- [ ] Site unter `culturalheritagedigital.github.io/Cindymill/` vollständig durchgeklickt
+- [ ] `README.md` neu gefasst (Website + `model/`, Link auf die Pages-URL)
+- [ ] Externe Verweise auf cindymill.xyz umgebogen (Repo-Website-Feld, Zenodo, Profile, Foren)
 - [ ] Ionos-Hosting-Paket gekündigt
 - [ ] Ionos-Domain `cindymill.xyz` gekündigt
