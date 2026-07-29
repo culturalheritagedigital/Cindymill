@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 30.07.2026 (Rev. 6 — AP 0, 1, 2, 3 und 4 ausgeführt)
+**Stand:** 30.07.2026 (Rev. 7 — AP 0, 1, 2, 3, 4 und 5 ausgeführt)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -121,7 +121,7 @@ Die drei Kategorien überlappen sich teilweise (`../assets\images\…`). Alle m�
 - `_config.yml` enthält zusätzlich `google_analytics: G-EFN1CTB4WB`.
 - `legal_notice.md` beschreibt **Universal Analytics** mit `_gat._anonymizeIp` und Opt-out-Add-on — beschreibt weder GA4 noch die Realität.
 
-Entscheidung: beides ersatzlos entfernen, Rechtstext entsprechend kürzen (AP 5).
+Entscheidung: beides ersatzlos entfernen, Rechtstext entsprechend kürzen (AP 5). ✅ Technik in AP 4 entfernt, Rechtstext in AP 5 gestrichen.
 
 > 🔴 **Korrektur (bei AP 3 belegt): `G-EFN1CTB4WB` ist keine Leiche.** Rev. 4 hielt die ID für nicht ausgeliefert. Das galt nur, weil bisher ohne `JEKYLL_ENV=production` gebaut wurde: `_includes/scripts.html` zieht `google-analytics.html` unter der Bedingung `jekyll.environment == 'production' and site.google_analytics`. Gegengeprüft mit einem Produktionsbuild:
 >
@@ -139,7 +139,7 @@ Entscheidung: beides ersatzlos entfernen, Rechtstext entsprechend kürzen (AP 5)
 
 #### 🟠 G) Weitere Befunde
 
-- `legal_notice.md`: `href="www.cindymill.xyz"` ohne Schema → wird als relativer Pfad interpretiert, tot. Muss ohnehin auf die neue Adresse. ✅ Link behoben (AP 2), Fließtext offen (AP 5)
+- `legal_notice.md`: `href="www.cindymill.xyz"` ohne Schema → wird als relativer Pfad interpretiert, tot. Muss ohnehin auf die neue Adresse. ✅ Link behoben (AP 2), Fließtext in AP 5 (25 Nennungen)
 - `assets/stylesheets/main.css.map` (218 KB) öffentlich abrufbar — unnötig. ✅ AP 3 (`sourcemap: never`)
 - Ungültiges HTML: `<meta name='ir-site-verification-token' value='276008534' />` — `value` statt `content`. ✅ AP 4
 - IE-Altlasten: `<meta http-equiv="X-UA-Compatible">`, „cut the mustard"-Script, `no-js`-Klasse. ✅ alle drei in AP 4 entfernt
@@ -173,12 +173,14 @@ Nach dem Self-Hosting der Schrift holt der Browser noch **vier Bilder von Fremds
 
 | Host | Vorkommen | Wo |
 |---|---:|---|
-| `img.shields.io` (PayPal-Badge) | 2 | `index.html`, `files.md` |
-| `licensebuttons.net` (CC-Button) | 1 | `files.md` |
+| `img.shields.io` (PayPal-Badge) | 2 | `index.html`, `_assembly/z_axis_assembly.md` |
+| `licensebuttons.net` (CC-Button) | 1 | `index.html` |
 | `i.creativecommons.org` (CC-Button) | 1 | `files.md` |
 | `zenodo.org` (DOI-Badge) | 1 | `index.html` |
 
 Es ist dieselbe Fehlerklasse, die AP 4 bei Google Fonts behoben hat: Der Aufruf einer fremden Ressource überträgt die Besucher-IP dorthin. Alle vier sind statische Bilder und ließen sich verlustfrei mit ausliefern (dann bekämen sie auch `width`/`height`, siehe AP 4). **Zugeordnet zu AP 5**, weil es eine Datenschutzentscheidung ist und nicht Aufräumarbeit — außerdem verlieren die Badges dabei ihre (hier ohnehin nie genutzte) Aktualisierbarkeit. Die Links selbst bleiben in jedem Fall unverändert.
+
+> **Korrektur der Tabelle (bei AP 5 gegen den Build geprüft).** Die Spalte „Wo" war in zwei Zeilen falsch: der zweite PayPal-Badge steht nicht in `files.md`, sondern am Ende der Z-Achsen-Montageanleitung; der `licensebuttons.net`-Button steht in `index.html`, nicht in `files.md`. `files.md` bindet den CC-Button von `i.creativecommons.org` ein. Die Gesamtzahl (5 Einbindungen, 4 Hosts) stimmte. Zusätzlich fand sich in `index.html` eine **fünfte, nie gerenderte** `img.shields.io`-URL: die Markdown-Referenzdefinition `[cc-by-nc-sa-shield]` wird von keiner Stelle benutzt und erzeugt daher keinen Request — deshalb tauchte sie in der Build-Zählung nicht auf. In AP 5 gelöscht, sonst bliebe sie als irreführender Treffer bei jeder künftigen Suche nach Fremdhosts stehen. ✅ Befund L insgesamt erledigt in AP 5.
 
 #### 🔴 M) KORREKTUR (bei AP 4 aufgefallen): der AP-3-Bericht hat 4 html-proofer-Fehler übersehen
 
@@ -194,6 +196,43 @@ http://creativecommons.org/licenses/by-nc-sa/4.0/ is not an HTTPS link
 Die vier Links standen schon vor AP 3 im Quelltext (`index.html`, `files.md`) und haben mit AP 2/AP 3 nichts zu tun — `enforce_https` ist in html-proofer 5 standardmäßig aktiv und greift auch unter `--disable-external`. Der AP-3-Bericht war an dieser Stelle also **zu optimistisch**; die dortige Kernaussage („die Seite bricht unter `/Cindymill` nicht") bleibt davon unberührt, denn kein einziger der vier Fehler ist ein Pfad- oder `baseurl`-Fehler.
 
 Behoben in AP 4 durch Umstellung auf `https://` (gleiches Ziel, Creative Commons liefert seit Jahren HTTPS). Lehre für AP 6: Im CI zählt der **Exit-Code**, nicht die letzte Zeile der Ausgabe.
+
+#### 🔴 N) NEU (bei AP 5 gefunden): vier Sketchfab-`<iframe>` — die eigentlichen Drittserver-Aufrufe
+
+Befund L nannte die Badges „die einzigen verbliebenen Drittserver-Requests der Seite". Das war falsch, und zwar systematisch: die Zählung sah nur `<img>`. Vier Seiten binden je ein interaktives 3D-Modell per `<iframe>` von **`sketchfab.com`** ein:
+
+| Seite | Modell |
+|---|---|
+| `_assembly/frame_assembly.md` | Cindymill Frame |
+| `_assembly/portal_assembly.md` | Cindymill Portal |
+| `_assembly/z_axis_assembly.md` | Cindymill Z Axis |
+| `_parts/mechanical_parts.md` | Cindymill Screws |
+
+Datenschutzrechtlich ist das die **gewichtigere Einbindung**: ein iframe lädt eine komplette Fremdseite mit eigenem JavaScript und eigenen Cookies, nicht bloß ein Bild. Betreiber ist Sketchfab, Inc. (Epic Games, USA) — Drittlandtransfer, ausgelöst beim Seitenaufruf ohne jede Nutzerhandlung.
+
+Anders als die Badges lassen sie sich **nicht lokal ausliefern**: das Modell ist der Inhalt der Seite, kein Dekor. Damit kollidiert der Befund mit der Rahmenbedingung „Inhalt bleibt 1:1 erhalten". Gewählt in AP 5: **Einbindung bleibt, wird aber in der Datenschutzerklärung offengelegt** (neuer Abschnitt 5, inkl. Hinweis, welche vier Seiten betroffen sind und dass die übrigen 23 es nicht sind). Die strengere Variante — Klick-zum-Laden mit Vorschaubild — ist als offene Entscheidung in AP 5 dokumentiert, weil sie das Ladeverhalten der Seite ändert.
+
+Die Zahl aus AP 4 ist damit zu korrigieren: nach AP 5 lädt die Seite **kein einziges Bild** mehr von fremden Servern, aber **vier iframes** von einem.
+
+#### 🟠 O) NEU (bei AP 5 gefunden): drei Fehler im Rechtstext, die nichts mit dem Umzug zu tun haben
+
+1. **Der LinkedIn-Abschnitt beschreibt eine Komponente, die es nicht gibt.** Abschnitt 8 der Datenschutzerklärung erklärte über fünf Absätze das LinkedIn-Plug-in. Im gesamten Projekt gibt es **keine** LinkedIn-Einbindung und nicht einmal einen LinkedIn-Link — die 28 Treffer für „LinkedIn" im Build stammten alle aus diesem Abschnitt selbst. Er stand also da wie die Google-Analytics-Beschreibung: als Textbaustein ohne Bezug zur Seite. Gestrichen.
+2. **Die sichtbare E-Mail-Adresse im Impressum stimmte nicht mit dem Link.** `<a href="mailto:cindymill@culturalheritage.digital">info@culturalheritage.digital</a>` — Linkziel und Anzeigetext waren verschiedene Postfächer. Im Impressum ist das keine Kleinigkeit: die Pflichtangabe ist der sichtbare Text. Auf `cindymill@…` vereinheitlicht (das ist das Postfach, das auch Abschnitt 2 nennt).
+3. **Vier von acht Seiten mit Affiliate-Links trugen keinen Hinweis** — siehe AP 5.6.
+
+Zum Gegenstück Facebook (in AP 5.6 mitzuprüfen): Es gibt **kein** Facebook-Plug-in. Die Gruppe wird an fünf Stellen als gewöhnlicher Link genannt, das Logo in `community.md` liegt seit AP 2 lokal. Ein Facebook-Abschnitt war in der Erklärung nicht vorhanden und wäre auch nicht nötig — ein Link überträgt nichts, solange er nicht geklickt wird.
+
+#### 🟠 P) NEU (bei AP 5 gefunden): Front Matter `introduction:` war nicht `baseurl`-fest
+
+AP 2 hat 27 Front-Matter-Pfade bewusst nur normalisiert, weil die zuständigen Includes `relative_url` selbst anwenden (`page.image`, `post.image.thumbnail`, …). Für **`introduction:`** gilt das nicht: das Feld enthält freien Markdown-Text mit eigenen Bild-Einbindungen, und `_includes/page-intro.html` gab ihn nur durch `markdownify` — was **kein Liquid auswertet**. Ein `{{ … | relative_url }}` im Front Matter wäre wörtlich im HTML gelandet.
+
+Aufgefallen ist das erst, als die Badges lokal wurden: solange sie absolute Fremd-URLs waren, gab es dort nichts zu präfixen. Eine relative Schreibweise (`assets/…` ohne führenden Slash) wäre auf `index.html` zufällig richtig gewesen, hätte aber `_plugins/image_attributes.rb` die Maße verschluckt — dessen `local_path` löst nur Pfade mit führendem Slash auf. Gelöst in `page-intro.html`, siehe AP 5.
+
+#### 🟢 Q) NEU (bei AP 5 gefunden): relative Pfade im JSON-LD von `jekyll-seo-tag` — folgenlos
+
+Der JSON-LD-Block enthält auf 10 Seiten ein `"thumbnail":"/assets/…"` **ohne** `baseurl`. Quelle ist `jekyll-seo-tag`, das den Front-Matter-Hash `image:` durchreicht; `og:image` und `twitter:image` daneben sind korrekt absolut. Folgenlos, weil `thumbnail` keine gültige schema.org-Eigenschaft für `WebPage` ist (die heißt `thumbnailUrl`) und von Auswertern ignoriert wird. Nicht angefasst: ein `baseurl` im Front Matter würde in `_includes/entry.html` doppelt präfixiert. Hier notiert, damit der Fund nicht ein drittes Mal gemacht werden muss.
+
+**Warum html-proofer das nicht meldet, obwohl es ein `baseurl`-Fehler wäre:** Der Prüfer löst `/assets/…` gegen die Wurzel von `_site/` auf — dort existiert die Datei. Live liegt die Wurzel aber unter `/Cindymill/`. `--swap-urls '^/Cindymill/:/'` normalisiert nur die korrekt präfixierten Pfade und lässt die unpräfixierten stehen, wo sie ebenfalls aufgehen. **Ein vergessener `baseurl` in einem `src` fällt html-proofer damit nicht auf** — das ist die Grenze der Absicherung aus AP 2/3 und der Grund, warum in AP 5 zusätzlich stumpf nach `(src|href)="/assets/` im Build gesucht wurde.
 
 ### 1.4 Assets — neu vermessen
 
@@ -251,7 +290,8 @@ culturalheritagedigital/Cindymill (public)  ──►  GitHub Actions (Jekyll 4.
         │                                                                             │
    Root:   Jekyll-Quellcode                        culturalheritagedigital.github.io/Cindymill/
            + vendortes Theme                       HTTPS automatisch (*.github.io-Wildcard)
-           + optimierte assets/ (inkl. fonts/)     kein DNS, keine Domain, kein Zertifikatsthema
+           + optimierte assets/ (inkl. fonts/,      kein DNS, keine Domain, kein Zertifikatsthema
+             badges/)
            + _plugins/ (Bildmasse, nur mit Actions)
            + .github/workflows/
    model/: CAD-/Modelldaten (per exclude: nicht Teil des Builds)
@@ -315,6 +355,8 @@ Ziel: von 955,6 MB auf **< 50 MB**.
    ✅ Beides in AP 3 erledigt: `sass: sourcemap: never` in `_config.yml`, und die 21 Lunr-JS-Dateien wurden beim Vendoring gar nicht erst mitkopiert.
 
 **Ergebnis AP 1 (29.07.2026):** `assets/` von 913 MB auf **62 MB**, 172 Dateien — davon 41 MB Bilder und 21 MB CAD-ZIPs. Commit `72ee937`.
+
+> Stand nach AP 5: **63 MB, 187 Dateien**. Hinzugekommen sind die 8 WOFF2 der Schrift samt Lizenztext (AP 4, 228 KB) und die 3 Badges samt Herkunftsnotiz (AP 5, 5 KB). Das gebaute `_site/` ist 64 MB groß — weit unter dem 1-GB-Limit.
 
 Das Ziel „< 50 MB" ist damit knapp verfehlt, dominiert vom 20-MB-CAD-ZIP. Bei 1 GB Pages-Limit ist das folgenlos; zwei Hebel bleiben, falls es doch stören sollte:
 
@@ -567,9 +609,9 @@ Vorgeladen wird nur `fira-sans-normal-400-latin.woff2` — der Fließtextschnitt
 | `decoding="async"` | 181 / 181 |
 | `loading="lazy"` | 164 |
 | `loading="eager"` + `fetchpriority="high"` (Intro-Bild) | 17 |
-| `width` + `height` | **176** / 181 |
+| `width` + `height` | **176** / 181 → seit AP 5: **181 / 181** |
 
-Die fünf Bilder ohne Maße sind die Badges fremder Hosts — ihre Größe ist lokal nicht bekannt (neuer Befund L). Vorhandene Attribute werden nie überschrieben: `_includes/page-intro.html` setzt `loading="eager"`/`fetchpriority="high"` selbst, weil das Intro-Bild fast immer das LCP-Element ist. Drei Icons in `community.md`/`files.md` tragen im Quelltext ein `width="50"`/`width="75"` **ohne** Höhe — dort leitet das Plugin die fehlende Hälfte aus dem Seitenverhältnis der Datei ab (Discord-Logo 71×55 → `50×39`), denn erst das Paar verhindert den Layout-Shift.
+Die fünf Bilder ohne Maße sind die Badges fremder Hosts — ihre Größe ist lokal nicht bekannt (neuer Befund L). ✅ Mit AP 5 liegen sie lokal, damit sind es 181 von 181. Vorhandene Attribute werden nie überschrieben: `_includes/page-intro.html` setzt `loading="eager"`/`fetchpriority="high"` selbst, weil das Intro-Bild fast immer das LCP-Element ist. Drei Icons in `community.md`/`files.md` tragen im Quelltext ein `width="50"`/`width="75"` **ohne** Höhe — dort leitet das Plugin die fehlende Hälfte aus dem Seitenverhältnis der Datei ab (Discord-Logo 71×55 → `50×39`), denn erst das Paar verhindert den Layout-Shift.
 
 Ohne zusätzliches Gem: die Maße kommen aus den Dateiköpfen (JPEG-SOF-Marker, PNG-IHDR, GIF-Header, SVG `width`/`height` bzw. `viewBox`) — im Projekt gibt es nur diese vier Formate.
 
@@ -594,7 +636,7 @@ Zusätzlich, weil „0 Fehler" allein nichts beweist (die Lehre aus Befund M):
 
 **Offen aus AP 4:** nichts. Weitergegeben an AP 5: die fünf Fremd-Badges (Befund L). Weitergegeben an AP 7.3: `README.md` enthält denselben `http://`-CC-Link — die Datei ist vom Build ausgeschlossen und wird dort ohnehin neu gefasst.
 
-### AP 5 — Datenschutz & Rechtstexte
+### AP 5 — Datenschutz & Rechtstexte ✅ ausgeführt (30.07.2026)
 
 Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses Paket erheblich.
 
@@ -605,7 +647,107 @@ Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses
    ✅ Geprüft: Die Kontakt-E-Mail lautet `cindymill@culturalheritage.digital` — **andere Domain, von der Kündigung nicht betroffen.**
 5. **Fünf Fremd-Badges entscheiden (Befund L, neu aus AP 4).** `img.shields.io` (2×), `licensebuttons.net`, `i.creativecommons.org`, `zenodo.org` — die einzigen verbliebenen Drittserver-Requests der Seite, nachdem AP 4 die Google Fonts self-hosted hat. Empfehlung: die vier statischen Bilder mit ins Repo legen (`assets/images/badges/`), Links unverändert lassen. Dann ist die Seite frei von Drittserver-Aufrufen und die Badges bekommen `width`/`height` wie alle anderen Bilder.
 6. **Affiliate-Kennzeichnung prüfen:** 115× `amzn.to`, 102× `ebay.us`, 94× AliExpress-Links. Kennzeichnungspflicht besteht unabhängig vom Hosting. Ebenso die LinkedIn- und Facebook-Abschnitte auf Aktualität prüfen.
-6. Konsequenz aus dem Wegfall des Trackings: keine Cookies, kein Consent-Banner, keine Cookie-Richtlinie nötig.
+7. Konsequenz aus dem Wegfall des Trackings: keine Cookies, kein Consent-Banner, keine Cookie-Richtlinie nötig.
+
+#### Ergebnis AP 5 (30.07.2026) — Commit `7e78caa`
+
+12 Dateien, +89/−73, dazu 4 neue Dateien in `assets/images/badges/` (5 KB). Build, Produktionsbuild und html-proofer laufen durch.
+
+| # | Schritt | Ergebnis |
+|---|---|---|
+| 1 | Tracking-Technik | ✅ war schon in AP 4 erledigt, im Produktionsbuild erneut gegengeprüft: 0 Analytics-IDs |
+| 2 | Analytics-Abschnitt streichen | ✅ Abschnitt 7 (Universal Analytics) ersatzlos gelöscht |
+| 3 | Hosting-Angabe | ✅ GitHub, Inc. — im Impressum **und** als neu gefasster Abschnitt 3 der Datenschutzerklärung |
+| 4 | `cindymill.xyz` ersetzen | ✅ **25 Nennungen in 19 Zeilen** (nicht 3, siehe unten) |
+| 5 | Fremd-Badges | ✅ alle 5 Einbindungen lokal, `assets/images/badges/`, 3 Dateien |
+| 6 | Affiliate-Kennzeichnung + LinkedIn/Facebook | ✅ 4 Seiten nachgekennzeichnet, LinkedIn-Abschnitt gestrichen, Facebook: nichts zu tun |
+| 7 | Keine Cookies / kein Consent-Banner | ✅ als Abschnitt 4 ausdrücklich in die Erklärung geschrieben |
+
+**Punkt 4 war um den Faktor 8 unterschätzt.** Der Plan sprach von „3 Stellen". Tatsächlich stand `cindymill.xyz` **25×** in der Datei — die Domain diente im ganzen Fließtext als *Name des Verantwortlichen* („the cindymill.xyz has implemented…", „an employee of the cindymill.xyz"). Der Generator, aus dem der Text stammt, hat dort offenbar das Feld „Unternehmensname" mit der Domain gefüllt. Ersetzt durch **„the Cindymill project"**, die Adresse selbst nur an der einen Stelle, wo tatsächlich eine Adresse gemeint war (Abschnitt 2, „Website:"). Dabei fiel ein Tippfehler des Originals mit: „the **i**ndymill.xyz" in Abschnitt 9 g).
+
+**Was aus dem Rechtstext geflogen ist.** 8.165 Zeichen, 15 Absätze:
+
+| Abschnitt | Grund |
+|---|---|
+| 7. Google Analytics | Beschrieb Universal Analytics mit `_gat._anonymizeIp` und dem Opt-out-Add-on. Der Dienst ist seit Juli 2023 abgeschaltet, und die Beschreibung passte auch vorher nicht auf das eingebundene GA4. |
+| 8. LinkedIn | Beschrieb ein LinkedIn-Plug-in, das es auf dieser Seite **nie** gab (Befund O). |
+
+**Was neu hineingekommen ist** — die Nummern 4 bis 6 sind neu, die alten Abschnitte 9–13 sind zu 10–14 geworden:
+
+| Abschnitt | Inhalt |
+|---|---|
+| 3 (neu gefasst) | Hosting durch GitHub, Inc. als Auftragsverarbeiter; Server-Logs mit IP-Adressen; **ausdrücklich: wir haben keinen Zugriff darauf** und können sie nicht auswerten oder löschen; Drittlandtransfer (SCC / EU-U.S. Data Privacy Framework) mit dem Hinweis, dass Behördenzugriff nicht ausgeschlossen werden kann; Links auf die GitHub-Datenschutzerklärung |
+| 4 (neu) | Keine Cookies, kein Tracking, keine Analyse, kein Consent-Banner — und der Satz, dass mit Ausnahme der 3D-Modelle keine Fremdserver kontaktiert werden |
+| 5 (neu) | Die vier Sketchfab-iframes (Befund N): Betreiber, welche Daten anfallen, dass es beim Seitenaufruf ohne Zutun passiert, **welche vier Seiten betroffen sind und dass die anderen 23 es nicht sind** |
+| 6 (neu) | Affiliate-Links: Provision, kein Einfluss auf den Preis, und die technisch wichtige Klarstellung, dass beim *Anzeigen* der Seite nichts an die Shops übertragen wird — erst beim Klick |
+
+Der Hosting-Abschnitt war eine **Ergänzung, keine Änderung**: Ionos kam im Rechtstext nie vor. Abschnitt 3 beschrieb Server-Logs so, als würden sie vom Verantwortlichen selbst geführt und ausgewertet („the cindymill.xyz analyzes anonymously collected data statistically"). Unter GitHub Pages ist das schlicht nicht möglich — genau diese Nicht-Verfügbarkeit steht jetzt dort.
+
+**Badges (Befund L) — 5 Einbindungen, 3 Dateien.** Die CC-Buttons von `licensebuttons.net` und `i.creativecommons.org` sind **byte-identisch** (SHA-256 `c15eb636…87c8`), eine Datei bedient also beide Einbindungen:
+
+| Datei | px | Ersetzt |
+|---|---|---|
+| `paypal-tip-me.svg` | 109×20 | `img.shields.io` in `index.html` und `_assembly/z_axis_assembly.md` |
+| `cc-by-nc-sa-4.0-88x31.png` | 88×31 | `licensebuttons.net` (`index.html`) **und** `i.creativecommons.org` (`files.md`) |
+| `zenodo-doi-5118794.svg` | 184×20 | `zenodo.org` in `index.html` |
+
+Die verlinkten Ziele (PayPal, Creative Commons, DOI) sind unverändert. Beide SVG enthalten **keine** externen Referenzen — beim shields.io-Badge steckt das PayPal-Logo als `data:`-URI darin, das wurde eigens geprüft. Herkunft, Abrufdatum, Lizenzlage und die Folge („die Badges sind jetzt Standbilder, der Zenodo-Badge zieht eine neue DOI-Version nicht mehr selbst nach") stehen in `assets/images/badges/README.txt` — dieselbe Praxis wie beim OFL-Text der Schrift in AP 4.
+
+**Nebenwirkung: `width`/`height` sind jetzt bei 181 von 181 Bildern.** Die fünf Ausnahmen aus AP 4 waren genau diese Badges — ihre Maße waren lokal nicht bekannt. `_plugins/image_attributes.rb` liest sie nun aus den Dateien, inklusive der beiden SVG (`width`/`height` im `<svg>`-Tag; Zenodo liefert `183.84375` → gerundet 184).
+
+**Affiliate-Kennzeichnung: die Hälfte fehlte.** Von 8 Seiten mit Affiliate-Links trugen nur 4 einen Hinweis:
+
+| Seite | Affiliate-Links | Hinweis vorher |
+|---|---:|---|
+| `_parts/mechanical_parts.md` | 191 | ✅ |
+| `_parts/electronic_parts.md` | 62 | ✅ |
+| `_parts/indymill_upgrade_parts.md` | 34 | ✅ |
+| `accessories.md` | 9 | ✅ |
+| `_posts/2021-08-01-SpeedsAndFeeds.md` | 10 | ❌ ergänzt |
+| `_parts/milled_parts.md` | 3 | ❌ ergänzt |
+| `_assembly/z_axis_assembly.md` | 2 | ❌ ergänzt |
+| `_assembly/portal_assembly.md` | 1 | ❌ ergänzt |
+
+Ergänzt wurde der **im Projekt schon vorhandene Wortlaut**, unverändert und an derselben Stelle (Seitenende, nach einer `---`-Trennlinie) — kein neuer Text, keine neue Formulierung. Zusätzlich benennt der neue Abschnitt 6 der Datenschutzerklärung die drei Programme. Nachgezählt im Build: 8 von 8 Seiten mit Affiliate-Links tragen jetzt den Hinweis.
+
+> ⚠️ **Eine Falle beim Anhängen:** `---` direkt in der Zeile nach einem Textabsatz macht diesen Absatz in Markdown zur `<h2>`-Überschrift (Setext-Syntax), statt eine Trennlinie zu erzeugen. Der erste Versuch hat genau das getan. Nötig ist eine Leerzeile davor. Im Build gegengeprüft: 8× `<p>This page contains affiliate links…`, 0× `<h2>`.
+
+**Sketchfab: offengelegt, nicht entfernt (Befund N).** Vier `<iframe>` von `sketchfab.com` sind nach AP 5 die **einzigen** Fremdserver-Aufrufe der Seite. Sie zu entfernen hieße, den Inhalt von vier Anleitungsseiten zu beschneiden — das verbietet die Rahmenbedingung „Inhalt bleibt 1:1 erhalten". Gewählt: vollständige Offenlegung in Abschnitt 5.
+
+> **Offene Entscheidung für den Betreiber.** Die strengere Variante wäre **Klick-zum-Laden**: statt des iframes ein lokales Vorschaubild mit Hinweistext, das den iframe erst auf Klick nachlädt. Sie hätte den Vorteil, dass ohne Einwilligung keine Daten in die USA gehen — der Punkt, an dem sich das Google-Fonts-Urteil des LG München (2022) und die Aufsichtsbehörden festmachen. Sie kostet: ein kleines Stück JavaScript, vier Vorschaubilder und die Sofort-Sichtbarkeit des Modells. **Nicht umgesetzt**, weil sie das Ladeverhalten der Seite ändert und damit über einen „rein technischen Umzug" hinausgeht. Der Aufwand liegt bei ~1 h, falls die Entscheidung anders ausfällt.
+
+**Zwei Rechtstext-Fehler ohne Umzugsbezug mitbehoben** (Befund O): die sichtbare E-Mail-Adresse im Impressum stimmte nicht mit ihrem `mailto:` überein, und der LinkedIn-Abschnitt beschrieb eine nicht vorhandene Komponente.
+
+**`_includes/page-intro.html` musste angepasst werden** (Befund P). Die Badges in `index.html` stehen im Front-Matter-Feld `introduction:` — dort wertet Jekyll kein Liquid aus, `relative_url` ist also nicht verfügbar. Der Include gab das Feld bisher nur durch `markdownify`. Jetzt bekommen absolute Asset-Pfade darin den `baseurl` nachträglich:
+
+```liquid
+{%- capture intro_asset_prefix -%}"{{ '/assets/' | relative_url }}{%- endcapture -%}
+{{ page.introduction | markdownify | replace: '"/assets/', intro_asset_prefix }}
+```
+
+Damit bleiben die Pfade im Front Matter in derselben Schreibweise wie die übrigen 27 (absolut, ohne Liquid) und funktionieren unter `/Cindymill/`. Ergebnis im Build: `src="/Cindymill/assets/images/badges/paypal-tip-me.svg"`.
+
+**Verifikation.**
+
+```
+bundle exec jekyll build                          → 27 Seiten, 2 Sass-Deprecations (unverändert)
+JEKYLL_ENV=production bundle exec jekyll build    → 0 Analytics-IDs, 0 googletagmanager
+bundle exec htmlproofer ./_site --disable-external --swap-urls '^/Cindymill/:/'
+  → 43 interne Links, 27 Dateien, finished successfully, Exit-Code 0
+```
+
+Zusätzlich, weil html-proofer für diese Fragen blind ist:
+
+- **Alle ladenden Elemente des Builds aufgezählt** (`link`/`script`/`iframe`/`img`/`video`/`audio`/`source`/`embed`/`object` mit `http(s)`-Ziel): **4 Treffer, alle `sketchfab.com`**. Kein Bild, kein Skript, keine Schrift von fremden Servern mehr. Die 33 `github.com`- und 115 `amzn.to`-Treffer sind `<a href>` — Hyperlinks laden nichts.
+- **Stumpf nach `(src|href)="/assets/` im Build gesucht** (ohne `baseurl`): 0 Treffer. Nur das folgenlose `"thumbnail":` im JSON-LD bleibt (Befund Q) — html-proofer hätte einen echten Treffer hier **nicht** gemeldet, siehe dort.
+- **Badge-Maße gegen die Dateien geprüft:** 109×20, 88×31, 184×20; `width`/`height` an 181 von 181 `<img>`.
+- **Beide CC-PNG-Quellen als identisch nachgewiesen**, bevor eine Datei für beide Einbindungen verwendet wurde.
+- **Abschnittsnummerierung der Datenschutzerklärung durchgezählt:** 1–14 lückenlos, keine verwaisten Querverweise („as stated above", „explained above") auf gelöschte Abschnitte.
+
+**Offen aus AP 5:** die Entscheidung zu Klick-zum-Laden bei Sketchfab (oben). **Weitergegeben:**
+
+- an **AP 7.3**: die drei `Readme.md` unter `model/` verlinken noch `http://www.cindymill.xyz` (`model/Tools/`, `model/Accessories/`, `model/10mm_Milled_Aluminum_Version/Spacers/`). Sie sind vom Build ausgeschlossen, gehören aber zu den eigenen Verweisen, die vor der Kündigung umzubiegen sind. In `model/Accessories/Readme.md` zeigt der Link zusätzlich auf `/addons`, während der Linktext `/accessories` sagt.
+- an **AP 8.4**: in `_posts/2021-08-01-SpeedsAndFeeds.md` zeigt der Link „join our facebook group!" auf `/parts/electronic_parts/` statt auf die Facebook-Gruppe, ein zweiter Link im selben Absatz („Here is a list of cutters I use.") auf dasselbe Ziel. Vorbestehend seit dem ersten Commit (`74e6bbf`), also **nicht** von AP 2 verursacht — nachgeprüft. Inhaltsfehler wie Befund J, aber ohne die dort vorhandene eindeutige Konvention: welches Ziel gemeint war, muss der Autor entscheiden.
 
 ### AP 6 — GitHub-Actions-Workflow
 
@@ -618,11 +760,16 @@ Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses
 
 `htmlproofer` im Build ist der wichtigste Teil — genau so wären die 73 Backslash-Links nie live gegangen, und genau so fällt ein `baseurl`-Fehler künftig sofort auf. Externe Links im CI ausschließen (`--ignore-status-codes` bzw. `--disable-external`), Laufzeit.
 
-**Drei Vorgaben aus AP 4, die der Workflow einhalten muss:**
+**Vier Vorgaben aus AP 4 und AP 5, die der Workflow einhalten muss:**
 
 1. **`--swap-urls '^/Cindymill/:/'`** an `htmlproofer` übergeben. `baseurl` steht seit AP 4 dauerhaft in `_config.yml`; ohne den Schalter meldet jeder korrekte Pfad einen Fehler. Kein `--baseurl` am `build`-Aufruf nötig.
 2. **Kein `bundle exec jekyll build --safe`** und kein Rückfall auf den klassischen Pages-Build: beides ignoriert `_plugins/image_attributes.rb`, und zwar **ohne Fehlermeldung** — `loading`, `decoding` und alle Bildmaße fielen still weg.
 3. Der Exit-Code von `htmlproofer` ist verlässlich (1 bei Fehlern, 0 sonst, in AP 4 gegengeprüft). Er ist das Abbruchkriterium — **nicht** die letzte Zeile der Ausgabe, siehe Befund M.
+4. **Aus AP 5: zwei stumpfe `grep`-Prüfungen ergänzen**, für die html-proofer nachweislich blind ist (Befund Q):
+   - `grep -rE '(src|href)="/assets/' _site` muss **leer** sein — sonst fehlt irgendwo der `baseurl`, und html-proofer meldet es nicht, weil der Pfad gegen die `_site`-Wurzel aufgeht.
+   - `grep -c 'width=' _site/index.html` als Wächter dafür, dass `_plugins/` gelaufen ist (Vorgabe 2). Erwartung nach AP 5: `width`/`height` an allen 181 `<img>`.
+
+   Beides sind Einzeiler und decken genau die zwei Fehlerklassen ab, die dieser Umzug als „lokal unsichtbar" kennengelernt hat.
 
 ### AP 7 — Livegang und Ionos-Kündigung (Reihenfolge einhalten!)
 
@@ -660,12 +807,14 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | ✅ 199 Referenzen + 17 interne Links; html-proofer mit AP 3 nachgeholt: 0 Fehler |
 | 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | ✅ Build läuft, html-proofer 0 Fehler |
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | ✅ SEO-Metadaten gültig, kein Tracking, Schrift self-hosted, Bildmaße im Build |
-| 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | offen (Punkt 1 mit AP 4 erledigt) |
+| 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | ✅ Analytics- und LinkedIn-Abschnitt raus, Hosting = GitHub, Badges lokal, Affiliate-Hinweise vollständig |
 | 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | offen |
 | 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | offen |
 | 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h | offen |
 
 > **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
+
+**AP 5 hat die Reihenfolge ebenfalls nicht verschoben**, aber eine Entscheidung offen gelassen, die kein Blocker ist: Klick-zum-Laden für die vier Sketchfab-Einbindungen (Befund N). Sie kann vor oder nach dem Livegang getroffen werden; die Datenschutzerklärung ist in beiden Fällen korrekt, im zweiten Fall nur knapper. Fällt sie für Klick-zum-Laden aus, ist Abschnitt 5 der Erklärung entsprechend zu kürzen.
 
 **AP 4 hat die Reihenfolge nicht verschoben.** Es war Aufräumarbeit auf einem laufenden Build, wie angekündigt — mit einer Ausnahme: `baseurl` steht jetzt dauerhaft in `_config.yml`, und `_plugins/` ist entstanden. Beides bindet AP 6 auf zwei Vorgaben fest (siehe dort).
 
@@ -687,6 +836,8 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | **Eigenes Plugin wird von einer anderen Build-Umgebung ignoriert** | mittel, aber unsichtbar | `_plugins/image_attributes.rb` (AP 4) läuft nur beim Actions-Build. Der klassische Pages-Build und `--safe` überspringen es **ohne Fehlermeldung**: die Seite baut, sieht fast gleich aus, hat aber keine Bildmaße und kein Lazy-Loading mehr. Gegenmaßnahme: Vorgaben in AP 6 einhalten; als Dauerkontrolle taugt eine Zeile im Workflow, die `width=` im Build zählt. |
 | ~~Prüflauf meldet Erfolg, obwohl er Fehler gefunden hat~~ | ✅ **geklärt** | Befund M: Der AP-3-Bericht schrieb „0 Fehler", tatsächlich waren es 4. Ursache war die Auswertung der Ausgabe statt des Exit-Codes. Behoben, Exit-Code-Verhalten in AP 4 gegengeprüft, als Vorgabe in AP 6 verankert. |
 | `.gitignore`-Muster greifen tiefer als gedacht | niedrig, aber unsichtbar | Befund K: `vendor/` hätte 38 Theme-Dateien verschluckt, sichtbar erst im CI. Behoben. **Regel für künftige Einträge:** Werkzeug-Ordner auf den Root verankern (`/vendor/`), Sicherheitsmuster (`logs/`, `*.log`, `.htaccess`) absichtlich nicht. Neue Einträge mit `git check-ignore -v` gegenprüfen. |
+| **Sketchfab-iframes übertragen die Besucher-IP in die USA** | mittel, bewusst getragen | Befund N. Vier Anleitungsseiten binden 3D-Modelle per iframe ein; entfernen hieße Inhalt entfernen. In AP 5 vollständig offengelegt (Abschnitt 5 der Datenschutzerklärung, mit Nennung der betroffenen Seiten). Restrisiko bleibt: Aufsichtsbehörden verlangen für solche Einbindungen zunehmend eine Einwilligung. Härtere Option ist dokumentiert (Klick-zum-Laden, ~1 h). |
+| **Prüfwerkzeug ist für die eigene Kernfrage blind** | mittel, unsichtbar | Befund Q: html-proofer löst `src="/assets/…"` gegen die `_site`-Wurzel auf und meldet einen fehlenden `baseurl` deshalb **nicht** — obwohl genau das der Blocker aus Befund D war. Gegenmaßnahme: zusätzlich stumpf nach `(src\|href)="/assets/` im Build suchen. Gehört als Zeile in den Workflow (AP 6). |
 | Bild-Optimierung zerstört Bildqualität | niedrig | Originale liegen im Backup (nicht im Repo), Stichproben visuell prüfen |
 | Personenbezogene Daten im öffentlichen Repo | niedrig, aber gravierend | `logs/` liegt bereits nur im Backup; vor dem ersten Push manuell prüfen und Git-History kontrollieren |
 | Kündigung vor funktionierendem Ersatz | niedrig | Reihenfolge in AP 7 strikt einhalten: erst Site live und geprüft, dann kündigen |
@@ -725,12 +876,20 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] Bildmaße gegen `sips` gegengeprüft: 151 Rasterbilder, 0 Abweichungen
 - [x] `url` + `baseurl: /Cindymill` gesetzt, sitemap/canonical/OG/robots/atom korrekt
 - [x] Kein Mixed Content mehr (4 CC-Lizenzlinks auf `https://`, Befund M)
-- [ ] Datenschutzerklärung: Analytics-Abschnitt raus, Hosting auf GitHub Inc., cindymill.xyz ersetzt
-- [ ] Fünf Fremd-Badges entschieden (Befund L: shields.io, licensebuttons.net, i.creativecommons.org, zenodo.org)
-- [ ] Affiliate-Kennzeichnung geprüft
+- [x] Datenschutzerklärung: Analytics-Abschnitt raus, Hosting auf GitHub Inc. (ergänzt, Ionos stand nie drin), 25 Nennungen von cindymill.xyz ersetzt
+- [x] LinkedIn-Abschnitt gestrichen (nie eine LinkedIn-Komponente eingebunden), Facebook geprüft: nur Links, kein Plug-in
+- [x] Neue Abschnitte: keine Cookies/kein Tracking, Sketchfab-iframes, Affiliate-Links; Nummerierung 1–14 durchgezählt
+- [x] Impressum: sichtbare E-Mail-Adresse an das `mailto:` angeglichen (Befund O)
+- [x] Fünf Fremd-Badges lokal ausgeliefert (Befund L) → `assets/images/badges/`, 3 Dateien, `README.txt` mit Herkunft
+- [x] `width`/`height` jetzt an 181 von 181 `<img>` (die 5 Badges waren die Lücke aus AP 4)
+- [x] Affiliate-Kennzeichnung: 4 von 8 Seiten hatten keine, ergänzt — 8/8 im Build gegengeprüft
+- [x] Keine Fremdserver-Bilder, -Skripte oder -Schriften mehr im Build; verbleibend: 4 Sketchfab-iframes (Befund N)
+- [ ] **Entscheidung offen:** Klick-zum-Laden für die vier Sketchfab-Einbindungen statt Direktladen (~1 h)
 - [ ] GitHub-Actions-Workflow deployt, htmlproofer meldet 0 tote interne Links
 - [ ] Site unter `culturalheritagedigital.github.io/Cindymill/` vollständig durchgeklickt
 - [ ] `README.md` neu gefasst (Website + `model/`, Link auf die Pages-URL)
 - [ ] Externe Verweise auf cindymill.xyz umgebogen (Repo-Website-Feld, Zenodo, Profile, Foren)
+- [ ] Die drei `Readme.md` unter `model/` auf die neue Adresse umgebogen (aus AP 5 an AP 7.3 gegeben)
+- [ ] Fehlleitender Link „join our facebook group!" in `SpeedsAndFeeds` (aus AP 5 an AP 8.4 gegeben)
 - [ ] Ionos-Hosting-Paket gekündigt
 - [ ] Ionos-Domain `cindymill.xyz` gekündigt
