@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 29.07.2026 (Rev. 4 — AP 0, 1 und 2 ausgeführt)
+**Stand:** 30.07.2026 (Rev. 5 — AP 0, 1, 2 und 3 ausgeführt)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -35,18 +35,22 @@ Da Webspace und Domain gekündigt werden, ist an keinem dieser Punkte etwas zu r
 
 ### 1.2 Technologie-Stack
 
-| Komponente | Version | Bewertung |
+Ausgangslage (vor AP 3) und Stand nach AP 3:
+
+| Komponente | vorher | nachher (AP 3) |
 |---|---|---|
-| Jekyll | 4.2.1 (Okt 2021) | veraltet; aktuell 4.4.x |
-| Theme | `jekyll-theme-basically-basic` 1.4.5 | seit ~2019 nicht gepflegt; **lokal nicht installiert** |
-| jekyll-seo-tag | 2.7.1 | veraltet |
-| jekyll-sass-converter | 2.1.0 (via `sassc`) | **kritisch**: native Extension, baut auf Ruby 3.4 / arm64 nicht mehr zuverlässig |
-| `Gemfile.lock` | Plattform `x64-mingw32` | von Windows; muss auf macOS neu aufgelöst werden |
-| jekyll-algolia | im Gemfile | ungenutzt (`search: false`) — entfernen |
+| Jekyll | 4.2.1 (Okt 2021) | **4.4.1**, gepinnt auf `~> 4.4` |
+| Theme | `jekyll-theme-basically-basic` 1.4.5 — seit ~2019 nicht gepflegt, **lokal nicht installiert** | **vendort im Repo**, kein Gem mehr |
+| jekyll-seo-tag | 2.7.1 | 2.9.0 |
+| jekyll-sass-converter | 2.1.0 (via `sassc`) — **kritisch**, native Extension, baut auf Ruby 3.4 / arm64 nicht mehr | **3.1.0 via `sass-embedded` 1.102** |
+| `Gemfile.lock` | Plattform `x64-mingw32` (Windows) | neu aufgelöst, `arm64-darwin`/`ruby` |
+| jekyll-algolia | im Gemfile, ungenutzt (`search: false`) | entfernt |
+| `wdm` | Windows-Only | entfernt |
+| html-proofer | nicht vorhanden | 5.2.2 in der Test-Gruppe |
 
 Lokal: Ruby 3.4.1, Bundler 2.6.6, `gh` 2.96.0 (seit AP 0 installiert). Der Arbeitsordner ist seit AP 0 ein Klon von `culturalheritagedigital/Cindymill` auf dem Branch `website-migration`.
 
-> ⚠️ **Der Build läuft aktuell nicht.** Das Theme-Gem fehlt lokal, und damit fehlen `_layouts/` und `_sass/` komplett — im Projekt liegen nur 70 überschriebene `_includes/`. Der erste `bundle install` muss das Gem von rubygems.org holen, bevor überhaupt gebaut werden kann. Das ist zugleich die Voraussetzung für das Vendoring (AP 3.4).
+> ✅ **Der Build läuft seit AP 3.** Vorher fehlte das Theme-Gem lokal und damit `_layouts/` und `_sass/` komplett — im Projekt lagen nur 70 überschriebene `_includes/`. Das Gem wurde einmal von rubygems.org geholt und sofort vendort (AP 3.4); danach besteht keine Abhängigkeit von ihm mehr.
 
 ### 1.3 Technische Fehler — verifiziert
 
@@ -114,10 +118,20 @@ Die drei Kategorien überlappen sich teilweise (`../assets\images\…`). Alle m�
 #### 🟠 E) Google Analytics — wird entfernt
 
 - `_includes/head.html` lädt **hart codiert** GA4 `G-6J78SX32JE` — ohne Consent, ohne Opt-out.
-- `_config.yml` enthält zusätzlich `google_analytics: G-EFN1CTB4WB` — wird nirgends ausgeliefert (Leiche).
+- `_config.yml` enthält zusätzlich `google_analytics: G-EFN1CTB4WB`.
 - `legal_notice.md` beschreibt **Universal Analytics** mit `_gat._anonymizeIp` und Opt-out-Add-on — beschreibt weder GA4 noch die Realität.
 
 Entscheidung: beides ersatzlos entfernen, Rechtstext entsprechend kürzen (AP 5).
+
+> 🔴 **Korrektur (bei AP 3 belegt): `G-EFN1CTB4WB` ist keine Leiche.** Rev. 4 hielt die ID für nicht ausgeliefert. Das galt nur, weil bisher ohne `JEKYLL_ENV=production` gebaut wurde: `_includes/scripts.html` zieht `google-analytics.html` unter der Bedingung `jekyll.environment == 'production' and site.google_analytics`. Gegengeprüft mit einem Produktionsbuild:
+>
+> ```
+> JEKYLL_ENV=production bundle exec jekyll build
+>   → 2× G-6J78SX32JE  (hart codiert in head.html)
+>   → 1× G-EFN1CTB4WB  (aus _config.yml via scripts.html)
+> ```
+>
+> Der geplante Actions-Workflow setzt `JEKYLL_ENV=production` (AP 6). Die Seite hätte also **zwei** Analytics-Properties ohne Consent ausgeliefert — mehr als die alte Seite je hatte, ausgelöst durch den Umzug selbst. AP 4 muss deshalb **beide** Stellen entfernen; das Löschen des `head.html`-Snippets allein genügt nicht.
 
 #### 🟠 F) NEU: Zwei tote Quelldateien im Projekt
 
@@ -138,6 +152,20 @@ Entscheidung: beides ersatzlos entfernen, Rechtstext entsprechend kürzen (AP 5)
 #### 🟠 H) NEU (bei AP 2 gefunden): Icon-Pfade in `site.webmanifest` und `browserconfig.xml`
 
 Beide Dateien liegen unter `assets/images/favicons/` und enthalten absolute `/assets/…`-Pfade auf die App-Icons. Da sie **kein Front Matter** haben, behandelt Jekyll sie als statische Dateien und kopiert sie unverändert — Liquid wird darin nicht ausgewertet. Unter `/Cindymill/` hätten sie damit auf tote Pfade gezeigt, ohne dass es im HTML sichtbar geworden wäre. Behoben in AP 2.
+
+#### 🟠 I) NEU (bei AP 3 gefunden): `_includes/image-gallery.html` — toter Include mit Fremd-Proxy
+
+Ein lokal hinzugefügter Include (nicht Teil des Themes), der **von keiner Seite eingebunden** wird. Er hätte auch nicht funktioniert: die Bild-URLs laufen über den externen Proxy `images.weserv.nl` mit **fest verdrahteter Fremddomain** `jekyllcodex.org/{{ file.path }}` — also über eine Seite, die die Cindymill-Bilder nie hatte. Gelöscht in AP 3.
+
+#### 🟠 J) NEU (bei AP 3 gefunden): leerer Markdown-Link in `_parts/mechanical_parts.md`
+
+`[Amazon](){:target="_blank"}` in Zeile 179 baute zu `<a href="" target="_blank">` — ein Link auf die Seite selbst. Vorbestehender Inhaltsfehler, der einzige seiner Art im Projekt. Behoben in AP 3 nach der im Dokument selbst etablierten Konvention: fehlt ein Amazon-Link, bleibt die Tabellenzelle leer (so wie in Zeile 182). Es wurde **kein** Link erfunden.
+
+#### 🔴 K) NEU (bei AP 3 gefunden): `.gitignore` hätte 38 Theme-Dateien verschluckt
+
+Der Eintrag `vendor/` aus AP 0 war **nicht verankert**. Git-Ignore-Muster ohne führenden Slash greifen auf *jeder* Ebene — der Eintrag war für Bundlers `vendor/bundle` gedacht, hätte aber auch `_sass/basically-basic/vendor/` erfasst: die 38 Sass-Dateien von **susy** und **breakpoint**, die das vendorte Theme zum Bauen braucht.
+
+Das ist die unangenehmste Fehlerklasse dieses Umzugs: **lokal wäre nichts aufgefallen** (die Dateien liegen ja im Arbeitsordner), erst der CI-Build hätte mit „Can't find stylesheet to import" abgebrochen — nach dem Push, ohne lokal reproduzierbar zu sein. Verifiziert mit `git check-ignore -v`, behoben durch Verankerung auf `/vendor/` und `/.bundle/`. `logs/`, `*.log` und `.htaccess` bleiben **bewusst unverankert**: sie sollen auf jeder Ebene greifen.
 
 ### 1.4 Assets — neu vermessen
 
@@ -255,6 +283,7 @@ Ziel: von 955,6 MB auf **< 50 MB**.
    - WebP zusätzlich erzeugen und via `<picture>` ausliefern: **optional** — bringt weitere ~30 %, kostet aber Umbauten in allen Galerie-Templates. Bei „Inhalt bleibt wie er ist" vertretbar, aber nicht zwingend.
 6. **CAD-ZIPs (22 MB) bleiben im Repo** — bei 1 GB Pages-Limit unkritisch, und der Download-Link bleibt stabil. Alternative bei künftigem Wachstum: als GitHub **Release-Assets** ablegen (zählen nicht gegen das Pages-Limit).
 7. `main.css.map` nicht mehr ausliefern; Lunr-Dateien entfallen mit dem Vendoring (AP 3).
+   ✅ Beides in AP 3 erledigt: `sass: sourcemap: never` in `_config.yml`, und die 21 Lunr-JS-Dateien wurden beim Vendoring gar nicht erst mitkopiert.
 
 **Ergebnis AP 1 (29.07.2026):** `assets/` von 913 MB auf **62 MB**, 172 Dateien — davon 41 MB Bilder und 21 MB CAD-ZIPs. Commit `72ee937`.
 
@@ -331,11 +360,11 @@ Damit sind auch **`author.picture` und `logo` in `_config.yml` bereits `baseurl`
 
 Beide fehlenden Dateien sind **erwartet**: sie werden aus den Sass-/JS-Quellen des Theme-Gems erzeugt und kommen mit dem Vendoring in **AP 3.4** ins Projekt. Ansonsten: 0 Backslash-Pfade, 0 rohe `/assets/`- oder `../assets/`-Pfade im Body, 0 rohe interne Links.
 
-> ⚠️ **Punkt 7 (html-proofer) ist offen und nach AP 3 nachzuholen.** Der Build läuft derzeit nicht (Theme-Gem fehlt, `sassc` bricht auf Ruby 3.4). Die obige statische Prüfung ersetzt ihn nicht vollständig: sie kennt weder die vom Theme erzeugten Links noch die Paginierung. Erster echter html-proofer-Lauf: direkt nach AP 3.7, dann dauerhaft im CI (AP 6).
+> ✅ **Punkt 7 (html-proofer) ist mit AP 3 nachgeholt.** Der Lauf war blockiert, weil der Build nicht lief (Theme-Gem fehlte, `sassc` brach auf Ruby 3.4). Ergebnis nach AP 3: **0 Fehler, auch unter `--baseurl /Cindymill`** — die einzige Meldung war ein leerer Markdown-Link, der nicht aus AP 2 stammte (Befund J). Details im Ergebnisbericht zu AP 3. Dauerhaft im CI: AP 6.
 
 **Offener Nebenbefund aus der Prüfung.** `assets/images/gallery/frame/plates2.jpg` und `frame3.jpg` existieren noch, werden aber nur in zwei auskommentierten `<figure>`-Blöcken in `gallery.md` referenziert. Die Referenzprüfung in AP 1 hat Kommentare nicht ausgewertet, deshalb sind sie der Asset-Diät entgangen. Folgenlos (zusammen < 1 MB), gehört aber sauber gelöscht, falls AP 1 noch einmal angefasst wird.
 
-### AP 3 — Toolchain aktualisieren
+### AP 3 — Toolchain aktualisieren ✅ ausgeführt (30.07.2026)
 
 1. `Gemfile.lock` löschen und neu auflösen (die alte Datei ist Windows-spezifisch, `x64-mingw32`).
 2. `Gemfile`:
@@ -357,6 +386,69 @@ Beide fehlenden Dateien sind **erwartet**: sie werden aus den Sass-/JS-Quellen d
 6. Leere Collection `gallery` aus `_config.yml` entfernen (kein `_gallery/`-Ordner vorhanden). Beim selben Durchgang den auskommentierten Algolia-Block entfernen — er enthält einen `search_only_api_key` im Klartext. Der Schlüssel ist zwar nur lesend und war ohnehin schon öffentlich, gehört aber nicht in ein Repo; bei der Gelegenheit im Algolia-Konto widerrufen.
 7. Erster Testlauf: `bundle install && bundle exec jekyll build` — Fehler der Anhebung 4.2 → 4.4 abarbeiten (v. a. Sass-Deprecations; `liquid: error_mode: strict` greift strenger).
 
+#### Ergebnis AP 3 (30.07.2026) — Commit `e4f591e`
+
+106 Dateien, +7292/−334. **Der Build läuft — erstmals seit dem Umzug in den Arbeitsordner — lokal durch, in 0,22 s.**
+
+| # | Schritt | Ergebnis |
+|---|---|---|
+| 1 | `Gemfile.lock` neu auflösen | ✅ gelöscht, neu aufgelöst: 61 Gems, Plattformen `ruby`/`arm64-darwin` statt `x64-mingw32` |
+| 2 | `Gemfile` neu fassen | ✅ Jekyll `~> 4.4` (→ 4.4.1), `jekyll-sass-converter ~> 3.0` (→ 3.1.0), `jekyll-algolia` und `wdm` raus, `webrick ~> 1.8`, `jekyll-paginate` bleibt, `html-proofer ~> 5.0` in `group :test` |
+| 3 | `.ruby-version` | ✅ `3.4` — und in `exclude:` nachgezogen |
+| 4 | Theme vendorn | ✅ siehe unten |
+| 5 | `…gemspec` löschen | ✅ gelöscht, Eintrag aus `exclude:` entfernt |
+| 6 | Collection `gallery` + Algolia-Block | ✅ beide raus, dazu die drei `search*`-Schlüssel und der `_gallery`-Front-Matter-Default |
+| 7 | Erster Testbuild | ✅ 27 Seiten, `main.css` (53 KB) wird erzeugt, `model/` sauber ausgeschlossen |
+
+**Vendoring (3.4) — die `_includes/` waren schon vollständig.** Erwartet waren „70 überschriebene Includes, Rest fehlt". Tatsächlich lagen **alle** 70 Gem-Includes bereits lokal (Abgleich mit `comm`), plus zwei lokale Extras. Zu kopieren waren daher nur:
+
+| Kopiert aus dem Gem | Umfang |
+|---|---:|
+| `_layouts/` | 12 Dateien |
+| `_sass/` | 81 Dateien (davon 38 in `vendor/`: susy + breakpoint) |
+| `assets/stylesheets/main.scss` | 1 |
+| `assets/javascripts/main.js` | 1 |
+| `assets/javascripts/lunr/` | **nicht kopiert** (21 Dateien, `search: false`) |
+
+Die MIT-Lizenz des Themes liegt als `_sass/basically-basic/THEME-LICENSE.txt` bei — im Repo, aber außerhalb des Builds, da Jekyll `_sass/` nicht ausliefert. Der Urheberhinweis auf Michael Rose steht unverändert im Kopf von `_layouts/default.html`.
+
+**Suche restlos entfernt.** `search: false` galt schon vorher, die Fracht lag aber noch da — `_includes/search-form.html` wurde von `default.html` sogar **ungated** eingebunden, rendert also auf jeder Seite einen leeren `<div class="search-content">`. Entfernt: `_includes/search/` (Lunr + Algolia), `search-form.html`, `_sass/basically-basic/_search.scss` samt `@import`, die Such-Blöcke in `_layouts/default.html` (Toggle-Button und `search-content`-Div) und in `_includes/scripts.html`.
+
+**Der Algolia-API-Key ist aus `_config.yml` verschwunden** (`search_only_api_key: 9d5014e5bbc77372547bce778dfa5663`, auskommentiert). ⚠️ Er steht weiterhin in der **Git-Historie** und war ohnehin öffentlich — **im Algolia-Konto widerrufen** bleibt offen, siehe Checkliste.
+
+**Sass-Deprecations: 231 → 2.** Der Umstieg auf `sass-embedded` bringt Dart Sass 1.102 mit, das die Altlasten des Themes anmeckert — `@import`, `$a / $b`, `lighten()`, globale Builtins, `if()`, unäre Operatoren. Es sind **Warnungen, keine Fehler**; sie kündigen den Bruch in Dart Sass 3.0 an. Sie alle zu beheben hieße, 38 Dateien fremden Vendor-Codes (susy, breakpoint) zu migrieren — hoher Aufwand, hohes Regressionsrisiko, kein sichtbarer Nutzen, und in einem „rein technischen Umzug" nicht vorgesehen. Gewählt:
+
+```yaml
+sass:
+  sourcemap: never    # keine oeffentliche main.css.map (erledigt AP 1.7)
+  quiet_deps: true    # Deprecations des vendorten Themes stumm
+```
+
+`quiet_deps` schweigt nur über Dateien, die *nicht* der Einstiegspunkt sind — die zwei verbleibenden Warnungen stammen aus `assets/stylesheets/main.scss` selbst und bleiben als Erinnerung sichtbar. Der Bruch kann nicht unbemerkt einziehen: `jekyll-sass-converter ~> 3.0` verlangt `sass-embedded ~> 1.75`, also `< 2.0`. Ein zusätzlicher Pin wäre Redundanz.
+
+**`sourcemap: never` erledigt AP 1.7** — `main.css.map` (bisher 218 KB öffentlich abrufbar) wird nicht mehr erzeugt.
+
+**Verifikation — html-proofer, zweimal.** Damit ist der bis hierher aufgeschobene Punkt **AP 2.7** eingelöst:
+
+```
+bundle exec jekyll build                      → 27 Seiten
+bundle exec htmlproofer ./_site --disable-external
+  → 3 Checks (Images, Links, Scripts), 27 Dateien, 44 interne Links
+  → HTML-Proofer finished successfully
+
+bundle exec jekyll build --baseurl /Cindymill
+bundle exec htmlproofer ./_site --disable-external --swap-urls '^/Cindymill/:/'
+  → HTML-Proofer finished successfully
+```
+
+Der **zweite Lauf ist der wichtige**: er beweist, dass AP 2 gehalten hat und die Seite unter dem Projekt-Unterpfad nicht bricht — der Befund D war als Blocker eingestuft. Stichprobe aus dem `baseurl`-Build: `href="/Cindymill/assets/stylesheets/main.css"`, `src="/Cindymill/assets/images/gallery/frame_bw.jpg"`.
+
+> ⚠️ **Zur Aussagekraft:** html-proofer meldet die Bildprüfung nur im Fehlerfall, die Zeile „44 interne Links" zählt allein `<a>`-Ziele. Dass die **181 `<img>`** im Build wirklich geprüft werden, wurde eigens gegengetestet (Fixture mit kaputtem `src` → „internal image does not exist"). Ohne diesen Test wäre „0 Fehler" eine Scheinsicherheit gewesen.
+
+**Zwei Funde nebenbei:** der tote Include `image-gallery.html` (Befund I) und der leere Markdown-Link in `_parts/mechanical_parts.md` (Befund J) — letzterer war die einzige echte html-proofer-Meldung überhaupt. Und ein Fund, der ohne Prüfung erst im CI aufgeschlagen wäre: die **`.gitignore`-Falle** (Befund K) — `vendor/` unverankert hätte 38 der gerade vendorten Theme-Dateien aus dem Commit gehalten.
+
+**Offen aus AP 3:** nichts. Nicht Teil von AP 3 und weiterhin offen sind die Aufräumarbeiten, die die Planung AP 4/5 zuordnet — der GA4-Block und MathJax stehen noch in `_includes/head.html`, `google_analytics: G-EFN1CTB4WB` noch in `_config.yml`. Solange dieser Schlüssel gesetzt ist, zieht `_includes/scripts.html` unter `JEKYLL_ENV=production` zusätzlich `_includes/google-analytics.html` — beides fällt mit AP 4 weg. Ebenfalls noch da: die Google-Fonts-Einbindung über `_data/theme.yml` (`google_fonts: Fira Sans`), die AP 4 auf Self-Hosting umstellt.
+
 ### AP 4 — `_config.yml` und `head.html` modernisieren
 
 **`_config.yml`:**
@@ -373,7 +465,7 @@ Damit werden `canonical`, `og:url`, `og:image`, `sitemap.xml` und `robots.txt` e
 
 **`_includes/head.html`:**
 - MathJax-Block **ersatzlos löschen** (totes CDN, Mixed Content).
-- GA4-Snippet `G-6J78SX32JE` **ersatzlos löschen**.
+- GA4-Snippet `G-6J78SX32JE` **ersatzlos löschen** — und zusätzlich `google_analytics` aus `_config.yml`, sonst liefert der Produktionsbuild über `_includes/scripts.html` → `google-analytics.html` weiter `G-EFN1CTB4WB` aus (siehe Korrektur zu Befund E). Danach ist `_includes/google-analytics.html` toter Code und kann mit weg.
 - `<meta http-equiv="X-UA-Compatible">` löschen.
 - „Cut the mustard"-Script löschen.
 - eBay-Verifizierungs-Tag: `value=` → `content=` korrigieren, oder löschen, falls das Partnerprogramm nicht mehr aktiv ist.
@@ -390,7 +482,7 @@ Damit werden `canonical`, `og:url`, `og:image`, `sitemap.xml` und `robots.txt` e
 
 Die Entscheidung ist getroffen: **kein Tracking**. Damit vereinfacht sich dieses Paket erheblich.
 
-1. GA4-Snippet aus `_includes/head.html` und die tote ID `G-EFN1CTB4WB` aus `_config.yml` entfernen (AP 4).
+1. GA4-Snippet aus `_includes/head.html` **und** `google_analytics: G-EFN1CTB4WB` aus `_config.yml` entfernen (AP 4). Die zweite ID ist entgegen Rev. 4 **nicht** tot — sie würde im Produktionsbuild ausgeliefert, siehe Korrektur zu Befund E.
 2. `legal_notice.md` — **Analytics-Abschnitt streichen.** Er beschreibt Universal Analytics mit `_gat._anonymizeIp` und dem Opt-out-Browser-Add-on; beides existiert seit Juli 2023 nicht mehr und beschrieb ohnehin nie das, was lief.
 3. **Hosting-Angabe im Impressum** von Ionos auf **GitHub Inc.** ändern (Auftragsverarbeitung, US-Transfer). Ergänzen: GitHub Pages protokolliert Besucher-IP-Adressen — ein kurzer Absatz dazu gehört in die Datenschutzerklärung.
 4. **Alle Nennungen von `cindymill.xyz` ersetzen** (3 Stellen in `legal_notice.md`, u. a. „Internet address: www.cindymill.xyz" und die Verantwortlichen-Bezeichnung „the cindymill.xyz") durch `https://culturalheritagedigital.github.io/Cindymill/`.
@@ -442,8 +534,8 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 |---|---|---|---|---|
 | 0 | Repo anbinden, `model/`-Umbau, `.gitignore`, `gh` | — | 1 h | ✅ bis auf `gh auth login` und die Ionos-Vertragsdaten |
 | 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | 0 | 3–4 h | ✅ 913 MB → 62 MB |
-| 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | ✅ 199 Referenzen + 17 interne Links; html-proofer-Lauf nach AP 3 nachzuholen |
-| 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | offen |
+| 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | ✅ 199 Referenzen + 17 interne Links; html-proofer mit AP 3 nachgeholt: 0 Fehler |
+| 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | ✅ Build läuft, html-proofer 0 Fehler |
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | offen |
 | 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | offen |
 | 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | offen |
@@ -452,7 +544,7 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 
 > **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
 
-**AP 1, 2 und 3 sind die kritischen Blocker** — ohne sie ist der Umzug entweder unnötig teuer (Größe), oder er zementiert die kaputte Galerie und bricht zusätzlich an allen absoluten Pfaden.
+**AP 1, 2 und 3 waren die kritischen Blocker** — ohne sie wäre der Umzug entweder unnötig teuer geworden (Größe), oder er hätte die kaputte Galerie zementiert und zusätzlich an allen absoluten Pfaden gebrochen. **Alle drei sind seit dem 30.07.2026 erledigt und gegen den gebauten `/Cindymill`-Unterpfad verifiziert.** Ab hier ist nichts mehr blockierend: AP 4–6 sind Aufräum- und Konfigurationsarbeit auf einem laufenden Build.
 
 ---
 
@@ -463,9 +555,11 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | **`cindymill.xyz` wird nach Ablauf von Dritten registriert** | hoch, dauerhaft | Bewusste Entscheidung. Alle eigenen Verweise vorher umbiegen (AP 7.3). Bekannt ist: die Domain kann danach beliebig belegt werden — alte Links in Foren, Videos und Fremdseiten zeigen dann auf Inhalte Dritter. Wer das vermeiden will, müsste die Domain zu einem günstigeren Registrar transferieren statt zu kündigen. |
 | **Verlust der Suchmaschinen-Historie und aller Backlinks** | hoch | Unvermeidbare Folge der Domain-Aufgabe. Ohne die alte Domain ist keine 301-Weiterleitung möglich. |
 | Absolute Pfade brechen unter `baseurl` | hoch, aber beherrschbar | AP 2 vollständig ausführen, `htmlproofer` im CI als Dauerkontrolle (AP 6) |
-| Theme-Gem nicht mehr installierbar | mittel | Vendoring (AP 3.4) beim ersten erfolgreichen `bundle install` sofort durchführen. Solange das Gem noch auf rubygems.org liegt, ist das Zeitfenster offen. |
-| Jekyll 4.2 → 4.4 bricht das Theme | mittel | Theme vendorn, Build lokal verifizieren, bevor irgendetwas deployt wird |
-| Sass-Build scheitert auf Ruby 3.4 | mittel | `jekyll-sass-converter ~> 3.0` (sass-embedded) — eingeplant |
+| ~~Theme-Gem nicht mehr installierbar~~ | ✅ **erledigt** | Vendoring in AP 3.4 durchgeführt, das Zeitfenster wurde genutzt. Das Gem ist keine Abhängigkeit mehr. |
+| ~~Jekyll 4.2 → 4.4 bricht das Theme~~ | ✅ **erledigt** | Eingetreten ist nur, was erwartet war: Sass-Deprecations, keine Fehler. Build und html-proofer laufen durch. |
+| ~~Sass-Build scheitert auf Ruby 3.4~~ | ✅ **erledigt** | `jekyll-sass-converter 3.1.0` mit `sass-embedded` — `sassc` ist raus. |
+| Dart Sass 3.0 entfernt `@import` und Slash-Division | mittel, aber nicht akut | Das vendorte Theme nutzt beides. In AP 3 bewusst nur stummgeschaltet (`quiet_deps`) statt migriert. Schutz: `jekyll-sass-converter ~> 3.0` verlangt `sass-embedded < 2.0`, der Bruch kann nicht per `bundle update` einziehen. Fällig wird die Migration erst, wenn eine neue Converter-Generation erscheint — dann via `sass-migrator`. |
+| `.gitignore`-Muster greifen tiefer als gedacht | niedrig, aber unsichtbar | Befund K: `vendor/` hätte 38 Theme-Dateien verschluckt, sichtbar erst im CI. Behoben. **Regel für künftige Einträge:** Werkzeug-Ordner auf den Root verankern (`/vendor/`), Sicherheitsmuster (`logs/`, `*.log`, `.htaccess`) absichtlich nicht. Neue Einträge mit `git check-ignore -v` gegenprüfen. |
 | Bild-Optimierung zerstört Bildqualität | niedrig | Originale liegen im Backup (nicht im Repo), Stichproben visuell prüfen |
 | Personenbezogene Daten im öffentlichen Repo | niedrig, aber gravierend | `logs/` liegt bereits nur im Backup; vor dem ersten Push manuell prüfen und Git-History kontrollieren |
 | Kündigung vor funktionierendem Ersatz | niedrig | Reihenfolge in AP 7 strikt einhalten: erst Site live und geprüft, dann kündigen |
@@ -489,9 +583,14 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] 199 Asset-Referenzen normalisiert (172 Body auf `relative_url`, 27 Front Matter) + 17 interne Seitenlinks
 - [x] `site.webmanifest` / `browserconfig.xml` `baseurl`-fest gemacht (Befund H)
 - [x] Tote Links `milling1.mp4` / `stuff1.jpg` samt auskommentierter Blöcke entfernt
-- [ ] html-proofer-Lauf über den Build (blockiert bis AP 3 — Build läuft noch nicht)
-- [ ] Jekyll 4.4 + sass-embedded, Theme vendort, Build läuft lokal durch
-- [ ] MathJax-Block gelöscht, GA4-Snippet gelöscht, Google Fonts self-hosted
+- [x] html-proofer-Lauf über den Build: **0 Fehler**, auch unter `--baseurl /Cindymill`
+- [x] Jekyll 4.4.1 + sass-embedded, `Gemfile.lock` auf macOS neu aufgelöst, `.ruby-version` 3.4
+- [x] Theme vendort (`_layouts/` 12, `_sass/` 81, `main.scss`, `main.js`), Theme-Gem und `theme:`-Zeile entfernt
+- [x] Suche restlos entfernt (Includes, `_search.scss`, Layout-Blöcke), Algolia-Key aus `_config.yml`
+- [x] `main.css.map` wird nicht mehr ausgeliefert (`sass: sourcemap: never`)
+- [x] `.gitignore` verankert (`/vendor/`) — sonst wären 38 Theme-Dateien aus dem Commit gefallen
+- [ ] Algolia `search_only_api_key` im Algolia-Konto widerrufen (steht noch in der Git-Historie)
+- [ ] MathJax-Block gelöscht, GA4-Snippet gelöscht, Google Fonts self-hosted (Quelle: `_data/theme.yml`)
 - [ ] `url` + `baseurl: /Cindymill` gesetzt, sitemap/canonical/OG korrekt
 - [ ] Datenschutzerklärung: Analytics-Abschnitt raus, Hosting auf GitHub Inc., cindymill.xyz ersetzt
 - [ ] Affiliate-Kennzeichnung geprüft
