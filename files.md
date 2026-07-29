@@ -13,23 +13,23 @@ In case you are new to Github:
 - To download the project click the green "Code" button,
 - click "Download ZIP".
 
-![download](/assets/images/download.jpg)
+![download]({{ '/assets/images/download.jpg' | relative_url }})
 
 ---
 
 If you want to adapt Cindymill to your needs you can download the __complete model as one step file__ here: 
 
-<!-- <a href="../assets\cad\2021_09_22_Cindymill_Complete_Model.zip">Download Model</a> -->
+<!-- <a href="{{ '/assets/cad/2021_09_22_Cindymill_Complete_Model.zip' | relative_url }}">Download Model</a> -->
 
-<a href="../assets\cad\2021_09_22_Cindymill_Complete_Model.zip">
-<img src="assets\icons\cad_icon.svg" alt="Step File" width="75">
+<a href="{{ '/assets/cad/2021_09_22_Cindymill_Complete_Model.zip' | relative_url }}">
+<img src="{{ '/assets/icons/cad_icon.svg' | relative_url }}" alt="Step File" width="75">
 </a>
 
 Current version: 2021_09_22
 
 ---
 
-If you want to compare the target and actual dimensions of your machined plates, you can download __drawings with marked dimensions__ [here](/assets/cad/Cindymill_Drawings.zip).
+If you want to compare the target and actual dimensions of your machined plates, you can download __drawings with marked dimensions__ [here]({{ '/assets/cad/Cindymill_Drawings.zip' | relative_url }}).
 
 
 <br>

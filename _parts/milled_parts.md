@@ -29,7 +29,7 @@ Brittle alloys with higher tensile strength are way easier to machine. The follo
 
 I have successfully milled both AW-2007 and AW-5083 without active cooling. I still have a stock of AW-2007 sheets but since my milling parameters ("feeds and speeds") are dialed in for AW-5083 now, I actually only machine AW-5083 at the moment.
           
-![aluminum](/assets/images/aluminum.jpg)
+![aluminum]({{ '/assets/images/aluminum.jpg' | relative_url }})
 
 ## Frame
 For the frame six parts have to be produced, all have 10 mm thickness:
@@ -44,7 +44,7 @@ For the frame six parts have to be produced, all have 10 mm thickness:
 L and R are left and right, F and B are front back. The frame is symmetric, so you can also make the L parts twice.
 
 
-![Milled Parts](/assets/images/milled_frame.jpg)
+![Milled Parts]({{ '/assets/images/milled_frame.jpg' | relative_url }})
 
 ## Portal
 
@@ -59,9 +59,9 @@ The only thing that has to be adjusted is the **spacer** strength at the side pl
 
 I added a stp file for the sideplates with 15 mm thickness if you want to go big. They have countersinks, so that you can use all the screws from the list as if it was the normal 10 mm version. You will find it under: */Milled_Parts/Cindymill_15mm_Sideplates.step*
 
-![15mm Sideplates](/assets/images/Cindymill_15mm_Sideplates.jpg)
+![15mm Sideplates]({{ '/assets/images/Cindymill_15mm_Sideplates.jpg' | relative_url }})
 
-The **backplate** on the portal is usually underestimated - it's is essentially important for the stiffness of the portal ([see this post](/start/2021/07/24/Rigidity){:target="_blank"})! If you don't want / can produce such a big part from aluminum just make it from plywood to begin with. I made it from 6 mm aluminum. 
+The **backplate** on the portal is usually underestimated - it's is essentially important for the stiffness of the portal ([see this post]({{ '/start/2021/07/24/Rigidity.html' | relative_url }}){:target="_blank"})! If you don't want / can produce such a big part from aluminum just make it from plywood to begin with. I made it from 6 mm aluminum. 
 - *1x_Cindymill_Portal_Backplate_5-10mm.dxf*
 
 **More plates** in 10 mm:
@@ -71,7 +71,7 @@ The **backplate** on the portal is usually underestimated - it's is essentially 
 
 If not possible otherwise, you can print the ".._Spacer_.." parts. If so, print them very heavy (5 perimeters, 50% infill).
 
-![Milled Parts](/assets/images/milled_portal.jpg)
+![Milled Parts]({{ '/assets/images/milled_portal.jpg' | relative_url }})
 
 
 
@@ -85,7 +85,7 @@ The main plates all have 10 mm thickness:
 - *1x_Cindymill_Z_Axis_Topplate_10mm.dxf*
 - *1x_Cindymill_Z_Axis_Spindle_Plate_10mm.dxf*
 
-![Milled Parts](/assets/images/milled_zaxis.jpg)
+![Milled Parts]({{ '/assets/images/milled_zaxis.jpg' | relative_url }})
 
 
 Two spacers have to be made (with 3 mm and 5 mm thickness):
@@ -98,7 +98,7 @@ Depending on your combination of components you will have to **thread a few hole
 
 ---
 
-![back plate](/assets/images/zbackplate1.jpg)
+![back plate]({{ '/assets/images/zbackplate1.jpg' | relative_url }})
 __Backplate color codes:__ 
 - __red:__ only needed if you use the new Z axis with the indymill portal. If so, need to be threaded with M5,
 - __green:__ for bearing blocks, need to be threaded with M6,
@@ -106,7 +106,7 @@ __Backplate color codes:__
 
 ---
 
-![spindle plate](/assets/images/spindleplate1.jpg)
+![spindle plate]({{ '/assets/images/spindleplate1.jpg' | relative_url }})
 __Spindle plate color codes:__ 
 - __red:__ only needed if you use the 1.5kW spindle. If so, need to be threaded with M6,
 - __green:__ only needed if you use the 500W spindle. If so, need to be threaded with M6,
@@ -114,6 +114,6 @@ __Spindle plate color codes:__
 
 The spindle plate is the only part with countersinks so even if you plan to laser cut or water cut the plates, this plate has to be treated afterwards.
 
-![threads](/assets/images/threads.jpg)
+![threads]({{ '/assets/images/threads.jpg' | relative_url }})
 
-[Back to Parts](/parts)
+[Back to Parts]({{ '/parts/' | relative_url }})

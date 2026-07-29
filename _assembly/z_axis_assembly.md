@@ -39,7 +39,7 @@ Required parts:
 
 ---
 
-![image](/assets/images/assembly/assembly_zaxis1_m2.jpg)
+![image]({{ '/assets/images/assembly/assembly_zaxis1_m2.jpg' | relative_url }})
 
 - Move the Z axis backplate to the BK12 end, screw the backplate through the "portal nut spacer" (10 mm) to the portal nut holder (4x M5x30, _tight_). Tighten the screws between nut holder and nut.
 
@@ -49,28 +49,28 @@ Required parts:
 
 
 
-![image](/assets/images/assembly/assembly_zaxis2_m2.jpg)
+![image]({{ '/assets/images/assembly/assembly_zaxis2_m2.jpg' | relative_url }})
 
 - Cut M5 threads into the ends of the two 20x20 profiles (approx. 15 mm depth). Connect the profiles to the Z axis top plate with 2x M5x20, _tight_ (7-8 Nm max). Prepare the MGN12 rails (degrease and lubricate), put M3x8 screws and nuts in every hole of the rails, slide the rails onto the profiles (_loose_). Each rail has to have two rail blocks (MGN12H). Be careful when sliding the blocks onto the rails (don't loose balls).
 
 - Slide the top plate / profiles onto the nuts until the top plate locks into the back plate. Tighten the screws between back plate and profiles (5 Nm max). Be careful not to loose rail blocks (they could fall out downwards).
 
-![image](/assets/images/assembly/assembly_zaxis3_m2.jpg)
+![image]({{ '/assets/images/assembly/assembly_zaxis3_m2.jpg' | relative_url }})
 
 - Screw the bottom plate onto the back plate (2x M5x20, _tight_, 7-8 Nm max).
 
-![image](/assets/images/assembly/assembly_zaxis4_m2.jpg)
+![image]({{ '/assets/images/assembly/assembly_zaxis4_m2.jpg' | relative_url }})
 
 - Prepare the ball screw (SFU1204) (degrease and lubricate). Check if the ball nut is aligned the right way (the end for the screws looks away from the BK10 end). If it is misaligned you should print yourself a [removal tool](https://www.thingiverse.com/thing:809141) to turn the nuts without loosing balls. Don't forget the ball nut holder (6x M4x12, _loose_).
 - Put the ball screw onto the fixed bearing block (BK10), lock it with the fine nut.
 - Put the ball screw onto the BF10 bearing block.
 - Slide the ball screw between the profiles, screw both bearing blocks to the Z axis back plate with 6x M6x40, _tight_.
 
-![image](/assets/images/assembly/assembly_zaxis5_m2.jpg)
+![image]({{ '/assets/images/assembly/assembly_zaxis5_m2.jpg' | relative_url }})
 
 - Slide a coupler onto a NEMA23 motor, tighten the motor shaft side, push the motor through the "Z axis motor spacer" (5 mm) and the top plate onto the ball screw, tighten the coupler. Screw the motor to the top plate (4x M5x25 + nuts, _tight_).
 
-![image](/assets/images/assembly/assembly_zaxis6_m2.jpg)
+![image]({{ '/assets/images/assembly/assembly_zaxis6_m2.jpg' | relative_url }})
 
 ---
 
@@ -91,6 +91,6 @@ Congratulations, you finished the mechanical part of your build! Grab a bear, ta
 If these instructions have helped you, I would appreciate a small donation that will help me maintain this website. Thanks!
 [![Tip Me via PayPal](https://img.shields.io/badge/PayPal-tip%20me-green.svg?logo=paypal)](https://www.paypal.me/NikoPlath){:target="_blank"} 
 
-![image](/assets/images/assembly/assembly_zaxis7.jpg)
+![image]({{ '/assets/images/assembly/assembly_zaxis7.jpg' | relative_url }})
 
-Continue with [Electronics](/assembly/electronics_assembly).
+Continue with [Electronics]({{ '/assembly/electronics_assembly/' | relative_url }}).

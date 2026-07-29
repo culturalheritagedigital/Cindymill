@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 29.07.2026 (Rev. 3 — AP 0 ausgeführt)
+**Stand:** 29.07.2026 (Rev. 4 — AP 0, 1 und 2 ausgeführt)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -135,6 +135,10 @@ Entscheidung: beides ersatzlos entfernen, Rechtstext entsprechend kürzen (AP 5)
 - `_config.yml` deklariert eine Collection `gallery`, ein Ordner `_gallery/` existiert nicht.
 - Auskommentierter `<video>`-Block in `gallery.md` (Zeile 591) — bleibt auskommentiert bzw. wird gelöscht (Inhalt wird nicht erweitert).
 
+#### 🟠 H) NEU (bei AP 2 gefunden): Icon-Pfade in `site.webmanifest` und `browserconfig.xml`
+
+Beide Dateien liegen unter `assets/images/favicons/` und enthalten absolute `/assets/…`-Pfade auf die App-Icons. Da sie **kein Front Matter** haben, behandelt Jekyll sie als statische Dateien und kopiert sie unverändert — Liquid wird darin nicht ausgewertet. Unter `/Cindymill/` hätten sie damit auf tote Pfade gezeigt, ohne dass es im HTML sichtbar geworden wäre. Behoben in AP 2.
+
 ### 1.4 Assets — neu vermessen
 
 Referenzen wurden gegen das **gebaute `_site/`** geprüft (maßgeblich, weil Entwurfsdateien nicht zählen) und Backslash-Pfade normalisiert:
@@ -259,7 +263,7 @@ Das Ziel „< 50 MB" ist damit knapp verfehlt, dominiert vom 20-MB-CAD-ZIP. Bei 
 - `2021_09_22_Cindymill_Complete_Model.zip` als **GitHub-Release-Asset** ablegen → Site fällt auf 41 MB (Release-Assets zählen nicht gegen das Pages-Limit).
 - Die fünf PNG-Renderings (`rend5`–`rend11`, zusammen ~6 MB) mit `pngquant` verlustbehaftet quantisieren → ca. 4 MB weniger.
 
-### AP 2 — Asset-Pfade reparieren und `baseurl`-fest machen
+### AP 2 — Asset-Pfade reparieren und `baseurl`-fest machen ✅ ausgeführt (29.07.2026)
 
 Alle 185 Asset-Referenzen in einem automatisierten Durchgang normalisieren (Befunde A und D):
 
@@ -279,6 +283,57 @@ Alle 185 Asset-Referenzen in einem automatisierten Durchgang normalisieren (Befu
 7. Nach dem Build mit **html-proofer** verifizieren: 0 gebrochene interne Links.
 
 > Der letzte Punkt ist der eigentliche Test dieses Arbeitspakets. Ohne ihn merkt man den `baseurl`-Bruch erst live.
+
+#### Ergebnis AP 2 (29.07.2026) — Commit `<AP2>`
+
+23 Dateien geändert, **199 Asset-Referenzen** plus **17 interne Seitenlinks** normalisiert.
+
+| Kategorie | Anzahl | Behandlung |
+|---|---:|---|
+| Body-Asset-Referenzen (`.md`/`.html`) | 172 | → `{{ '/assets/…' \| relative_url }}` |
+| davon vorher mit Windows-Backslash | 75 | zusätzlich `\` → `/` |
+| Front-Matter-Pfade (`image`, `path`, `thumbnail`) | 27 | nur normalisiert (führender `/`), **kein** Liquid |
+| Interne Seitenlinks | 17 | → `{{ '/parts/' \| relative_url }}` usw. |
+| Favicon-Referenzen in `_includes/head.html` | 7 | → `relative_url` |
+| Referenzen in `site.webmanifest` / `browserconfig.xml` | 3 | Front Matter ergänzt + `relative_url` (neuer Befund H) |
+
+**Warum Front Matter anders behandelt wird.** Jekyll wertet in Front Matter kein Liquid aus — `image: "{{ … | relative_url }}"` wäre wirkungslos. Die maßgeblichen Includes liegen bereits lokal im Projekt und wenden den Filter selbst an:
+
+| Include | Zeile |
+|---|---|
+| `_includes/page-intro.html` | `page.image.path \| default: page.image \| relative_url` |
+| `_includes/entry.html` | `post.image.thumbnail \| relative_url` |
+| `_includes/author` | `author_picture \| relative_url` |
+| `_includes/masthead.html` | `site.logo \| relative_url` |
+
+Damit sind auch **`author.picture` und `logo` in `_config.yml` bereits `baseurl`-fest** — Punkt 3 der Liste oben erledigt sich dort ohne Änderung. `_includes/navigation.html` und `masthead.html` waren schon korrekt.
+
+**Neuer Befund H: `site.webmanifest` und `browserconfig.xml` waren ebenfalls betroffen.** Beide Dateien enthalten absolute `/assets/…`-Pfade auf Icons und wurden als statische Dateien unverändert kopiert. Ohne Front Matter rendert Jekyll darin kein Liquid; sie hätten unter `/Cindymill/` auf tote Icon-Pfade gezeigt. Lösung: leeres Front Matter (`---` / `---`) vorangestellt, damit Jekyll sie rendert, und die drei Pfade auf `relative_url` umgestellt.
+
+**Interne Seitenlinks auf die tatsächlich gebauten URLs gezogen.** Die 17 Links waren nicht nur `baseurl`-unfest, sondern teilweise auch formal ungenau (`/parts` statt `/parts/`, `/gallery` statt `/gallery.html`). Unter Apache mit MultiViews fiel das nicht auf; GitHub Pages ist toleranter als html-proofer. Die Ziele sind jetzt gegen das gebaute `_site/` abgeglichen:
+
+`/parts/`, `/assembly/`, `/assembly/{portal,z_axis,electronics}_assembly/`, `/parts/electronic_parts/`, `/gallery.html`, `/accessories.html`, `/start/2021/07/24/Rigidity.html`, `/start/2021/08/01/SpeedsAndFeeds.html`
+
+**Punkt 6 (zwei tote Links) erledigt — Präzisierung.** Beide lagen in **auskommentierten** Blöcken, waren also nie live sichtbar. Die Blöcke wurden gelöscht statt umgebogen (Inhalt wird nicht erweitert):
+
+- `<video>`-Block mit `assets/images/gallery/milling1.mp4` (zugleich der auskommentierte Video-Block aus Befund G)
+- `<figure>`-Block mit `assets/images/gallery/stuff1.jpg`
+
+**Punkt 5 (`legal_notice.md`) teilweise erledigt.** Der schemalose und damit tote Link `href="www.cindymill.xyz"` zeigt jetzt auf `https://culturalheritagedigital.github.io/Cindymill/`. Die restlichen ~20 Nennungen von `cindymill.xyz` stehen im Fließtext der Datenschutzerklärung und gehören zur Textüberarbeitung in **AP 5**.
+
+**Verifikation.** Statisch gegen die Dateisystem-Wirklichkeit geprüft (Skript löst jede Referenz auf, URL-dekodiert):
+
+```
+221 Ziele aufgelöst, 2 fehlend
+  /assets/stylesheets/main.css   (_includes/head.html)
+  /assets/javascripts/main.js    (_includes/scripts.html)
+```
+
+Beide fehlenden Dateien sind **erwartet**: sie werden aus den Sass-/JS-Quellen des Theme-Gems erzeugt und kommen mit dem Vendoring in **AP 3.4** ins Projekt. Ansonsten: 0 Backslash-Pfade, 0 rohe `/assets/`- oder `../assets/`-Pfade im Body, 0 rohe interne Links.
+
+> ⚠️ **Punkt 7 (html-proofer) ist offen und nach AP 3 nachzuholen.** Der Build läuft derzeit nicht (Theme-Gem fehlt, `sassc` bricht auf Ruby 3.4). Die obige statische Prüfung ersetzt ihn nicht vollständig: sie kennt weder die vom Theme erzeugten Links noch die Paginierung. Erster echter html-proofer-Lauf: direkt nach AP 3.7, dann dauerhaft im CI (AP 6).
+
+**Offener Nebenbefund aus der Prüfung.** `assets/images/gallery/frame/plates2.jpg` und `frame3.jpg` existieren noch, werden aber nur in zwei auskommentierten `<figure>`-Blöcken in `gallery.md` referenziert. Die Referenzprüfung in AP 1 hat Kommentare nicht ausgewertet, deshalb sind sie der Asset-Diät entgangen. Folgenlos (zusammen < 1 MB), gehört aber sauber gelöscht, falls AP 1 noch einmal angefasst wird.
 
 ### AP 3 — Toolchain aktualisieren
 
@@ -324,7 +379,7 @@ Damit werden `canonical`, `og:url`, `og:image`, `sitemap.xml` und `robots.txt` e
 - eBay-Verifizierungs-Tag: `value=` → `content=` korrigieren, oder löschen, falls das Partnerprogramm nicht mehr aktiv ist.
 - Google Fonts **self-hosten**: Fira Sans als WOFF2 in `assets/fonts/`, `@font-face` mit `font-display: swap`. Löst DSGVO-Thema und Render-Blocker zugleich.
 - `<link rel="preload">` für die Hauptschrift, `rel="preconnect"` zu Google entfernen.
-- Die 8 Asset-Referenzen auf `relative_url` umstellen (AP 2.3).
+- ~~Die 8 Asset-Referenzen auf `relative_url` umstellen (AP 2.3).~~ ✅ in AP 2 erledigt (7 Favicon-Pfade; `main.css` war bereits korrekt).
 
 **Templates/Layouts (nach dem Vendoring):**
 - Bilder: `loading="lazy"` und `decoding="async"` ergänzen (Hero-Bild stattdessen `fetchpriority="high"`).
@@ -387,7 +442,7 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 |---|---|---|---|---|
 | 0 | Repo anbinden, `model/`-Umbau, `.gitignore`, `gh` | — | 1 h | ✅ bis auf `gh auth login` und die Ionos-Vertragsdaten |
 | 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | 0 | 3–4 h | ✅ 913 MB → 62 MB |
-| 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | offen |
+| 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | ✅ 199 Referenzen + 17 interne Links; html-proofer-Lauf nach AP 3 nachzuholen |
 | 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | offen |
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | offen |
 | 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | offen |
@@ -431,7 +486,10 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] `_gallery_fancy.md` und `_about_us.md` (tote Entwürfe) gelöscht
 - [x] 340 verwaiste Assets (708 MB) entfernt, alle 11 Videos gelöscht
 - [x] 115 Bilder optimiert (183 MB gespart), `assets/` committet → 62 MB
-- [ ] 185 Asset-Referenzen auf `relative_url` normalisiert (73 Backslash + 106 absolut + 66 relativ)
+- [x] 199 Asset-Referenzen normalisiert (172 Body auf `relative_url`, 27 Front Matter) + 17 interne Seitenlinks
+- [x] `site.webmanifest` / `browserconfig.xml` `baseurl`-fest gemacht (Befund H)
+- [x] Tote Links `milling1.mp4` / `stuff1.jpg` samt auskommentierter Blöcke entfernt
+- [ ] html-proofer-Lauf über den Build (blockiert bis AP 3 — Build läuft noch nicht)
 - [ ] Jekyll 4.4 + sass-embedded, Theme vendort, Build läuft lokal durch
 - [ ] MathJax-Block gelöscht, GA4-Snippet gelöscht, Google Fonts self-hosted
 - [ ] `url` + `baseurl: /Cindymill` gesetzt, sitemap/canonical/OG korrekt

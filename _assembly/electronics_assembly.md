@@ -9,13 +9,13 @@ Coming soon!
 
 <!-- ## CAM Software
 
-![fusion](/assets/images/assembly/fusion_cam2.png)
+![fusion]({{ '/assets/images/assembly/fusion_cam2.png' | relative_url }})
 
 <br>
 
 ## Shield / Operating System
 
-![ugs](/assets/images/assembly/ugs.png)
+![ugs]({{ '/assets/images/assembly/ugs.png' | relative_url }})
 
 
-![estlcam](/assets/images/assembly/estlcam.png) -->
+![estlcam]({{ '/assets/images/assembly/estlcam.png' | relative_url }}) -->

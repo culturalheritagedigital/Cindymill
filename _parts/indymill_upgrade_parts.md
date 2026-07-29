@@ -4,7 +4,7 @@ image:
   path: /assets/images/upgrade_indymill_title1.jpg
   thumbnail: /assets/images/upgrade_indymill_title1.jpg
 ---
-This section describes the parts you need to upgrade an Indymill. Just follow the according [sections](/assembly/) for the assembly.
+This section describes the parts you need to upgrade an Indymill. Just follow the according [sections]({{ '/assembly/' | relative_url }}) for the assembly.
 
 If you have an Indymill it is easy to upgrade to a more reliable machine without spending too much money.
 Some of the upgrades listed below are independent of each other. To "stay in proportion" it is recommended to make all changes but you can make them one after another in a way: 
@@ -25,7 +25,7 @@ Brittle alloys with higher tensile strength are way easier to machine. The follo
 
 I have successfully milled both AW-2007 and AW-5083 without active cooling. I still have a stock of AW-2007 sheets but since my milling parameters ("feeds and speeds") are dialed in for AW-5083 now, I actually only machine AW-5083 at the moment.
           
-![aluminum](/assets/images/aluminum.jpg)
+![aluminum]({{ '/assets/images/aluminum.jpg' | relative_url }})
 
 <br>
 
@@ -37,7 +37,7 @@ So compare the prices from banggood vs. quality profiles from Europe/US, for me 
 
 Another important point: The "I-Type slot 5" profiles have tapholes for M5 threads (diameter 4.3 mm). All plates which are screwed to profile ends are prepared for M5. If you buy another system check for the taphole diameter. If needed I can export a set of plate files which are prepared for M6, just send me a message. 
 
-![tools](/assets/images/itype5.jpg)
+![tools]({{ '/assets/images/itype5.jpg' | relative_url }})
 
 The given lengths are for my machine, if you have other dimensions just change the last values of frame and gantry profiles:
 
@@ -86,7 +86,7 @@ For the frame six parts have to be produced, all have 10 mm thickness:
 L and R are left and right, F and B are front back. The frame is symmetric, so you can also make the L parts twice.
 
 
-![Milled Parts](/assets/images/milled_frame.jpg)
+![Milled Parts]({{ '/assets/images/milled_frame.jpg' | relative_url }})
 
 ### Portal
 
@@ -101,9 +101,9 @@ The only thing that has to be adjusted is the **spacer** strength at the side pl
 
 I added a stp file for the side plates with 15 mm thickness if you want to go big. They have countersinks, so that you can use all the screws from the list as if it was the normal 10 mm version. You will find it under: */Milled_Parts/Cindymill_15mm_Sideplates.step*
 
-![15mm Side plates](/assets/images/Cindymill_15mm_Sideplates.jpg)
+![15mm Side plates]({{ '/assets/images/Cindymill_15mm_Sideplates.jpg' | relative_url }})
 
-The **backplate** on the portal is usually underestimated - it's is essentially important for the stiffness of the portal ([see this post](/start/2021/07/24/Rigidity){:target="_blank"})! If you don't want / can produce such a big part from aluminum just make it from plywood to begin with. I made it from 6 mm aluminum. 
+The **backplate** on the portal is usually underestimated - it's is essentially important for the stiffness of the portal ([see this post]({{ '/start/2021/07/24/Rigidity.html' | relative_url }}){:target="_blank"})! If you don't want / can produce such a big part from aluminum just make it from plywood to begin with. I made it from 6 mm aluminum. 
 - *1x_Cindymill_Portal_Backplate_5-10mm.dxf*
 
 **More plates** in 10 mm:
@@ -113,7 +113,7 @@ The **backplate** on the portal is usually underestimated - it's is essentially 
 
 If not possible otherwise, you could also print the two ".._Spacer_.." parts. If so, print them heavy (4 perimeters, 75% infill).
 
-![Milled Parts](/assets/images/milled_portal.jpg)
+![Milled Parts]({{ '/assets/images/milled_portal.jpg' | relative_url }})
 
 ### Z Axis
 
@@ -125,7 +125,7 @@ The main plates all have 10 mm thickness:
 - *1x_Cindymill_Z_Axis_Topplate_10mm.dxf*
 - *1x_Cindymill_Z_Axis_Spindle_Plate_10mm.dxf*
 
-![Milled Parts](/assets/images/milled_zaxis.jpg)
+![Milled Parts]({{ '/assets/images/milled_zaxis.jpg' | relative_url }})
 
 
 Two spacers have to be made (with 3 mm and 5 mm thickness), you can print them (heavy):
@@ -136,7 +136,7 @@ Depending on your combination of components you will have to **thread a few hole
 
 ---
 
-![back plate](/assets/images/zbackplate1.jpg)
+![back plate]({{ '/assets/images/zbackplate1.jpg' | relative_url }})
 __Backplate color codes:__ 
 - __red:__ only needed if you use the new Z axis with the indymill portal. If so, need to be threaded with M5,
 - __green:__ for bearing blocks, need to be threaded with M6,
@@ -144,7 +144,7 @@ __Backplate color codes:__
 
 ---
 
-![spindle plate](/assets/images/spindleplate1.jpg)
+![spindle plate]({{ '/assets/images/spindleplate1.jpg' | relative_url }})
 __Spindleplate color codes:__ 
 - __red:__ only needed if you use the 1.5kW spindle. If so, need to be threaded with M6,
 - __green:__ only needed if you use the 500W spindle. If so, need to be threaded with M6,
@@ -152,7 +152,7 @@ __Spindleplate color codes:__
 
 The spindle plate is the only part with countersinks so even if you plan to laser cut or water cut the plates, this plate has to be treated afterwards.
 
-![threads](/assets/images/threads.jpg)
+![threads]({{ '/assets/images/threads.jpg' | relative_url }})
 
 <br>
 
@@ -166,7 +166,7 @@ The Cindymill uses ball screws on all axes. To upgrade your Z axis you will need
 
 You need two bearing blocks per ball screw: BK12 and BF12 for SFU1605, BK10 and BF10 for SFU1204. If they are not part of a ball screw set, you will need to order them separately. 
 To be able to attach them to the frame the blocks have to have holes in axial direction. Be sure that the blocks you order have these holes (see image below). 
-![tools](/assets/images/fixedblock1.jpg)
+![tools]({{ '/assets/images/fixedblock1.jpg' | relative_url }})
 
 | Part Name        | Quantity            
 | -------------    |:-------------   | -----:  | -------------: |:-------------:     | -----:      |
@@ -203,7 +203,7 @@ I published several **3D printed modifications to the original Indymill** on Thi
 
 
 
-[Back to Parts](/parts)
+[Back to Parts]({{ '/parts/' | relative_url }})
 
 ---
 

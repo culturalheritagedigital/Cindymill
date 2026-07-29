@@ -11,7 +11,7 @@ Information in accordance with Section 5 TMG
 <!-- <br>culturalheritage.digital -->
 <br>Lerchenstr. 81<br>22767 Hamburg<br>
 
-Telephone: +4940858878<br>E-Mail: <a href="mailto:cindymill@culturalheritage.digital">info@culturalheritage.digital</a><br>Internet address: <a href="www.cindymill.xyz" target="_blank">www.cindymill.xyz</a><br><br>
+Telephone: +4940858878<br>E-Mail: <a href="mailto:cindymill@culturalheritage.digital">info@culturalheritage.digital</a><br>Internet address: <a href="https://culturalheritagedigital.github.io/Cindymill/">culturalheritagedigital.github.io/Cindymill</a><br><br>
 
 <h2>Disclaimer</h2>
 

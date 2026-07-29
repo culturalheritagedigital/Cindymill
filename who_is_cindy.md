@@ -13,22 +13,22 @@ Advantages of the Cindymill:
 
 <br>
 
-![image](/assets/images/rend11.png)
+![image]({{ '/assets/images/rend11.png' | relative_url }})
 
-![image](/assets/images/rend2.png)
+![image]({{ '/assets/images/rend2.png' | relative_url }})
 
-![image](/assets/images/rend8.png)
-
-
-![image](/assets/images/rend5.png)
-
-![image](/assets/images/rend6.png)
-
-![image](/assets/images/rend7.png)
+![image]({{ '/assets/images/rend8.png' | relative_url }})
 
 
+![image]({{ '/assets/images/rend5.png' | relative_url }})
 
-![image](/assets/images/rend10.png)
+![image]({{ '/assets/images/rend6.png' | relative_url }})
+
+![image]({{ '/assets/images/rend7.png' | relative_url }})
+
+
+
+![image]({{ '/assets/images/rend10.png' | relative_url }})
 
 
 

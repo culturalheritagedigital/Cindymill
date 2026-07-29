@@ -6,7 +6,7 @@ categories:
   - start
 tags:
   - content
-image: "assets/images/feedsandspeeds1.jpg"
+image: "/assets/images/feedsandspeeds1.jpg"
 ---
 Successful milling depends on a large number of factors. However, if you pay attention to a few things and operate a suitable milling cutter with the correct feed rate and spindle speed, then you are already doing a lot of things right. This way you will get good results quickly and avoid frustration and local fires.
 
@@ -132,10 +132,10 @@ So, what could we change? Let's take a look at the formula:
 
 The 4-flute cutter from the example was chosen to illustrate one of the problems, we might have with those cutters. They should theoretically produce better surfaces but they need feed rates we might not be able to achieve with our machines (There is more about pros and cons for different cutters but maybe that's a topic for another article).
 
-My shiny 4-flute cutters that I originally bought are all on the shelf and I almost only mill with 1- and 2-flute cutters, partly because they give me feed rates that I can realize. [Here is a list of cutters I use.](/parts/electronic_parts/){:target="_blank"}
+My shiny 4-flute cutters that I originally bought are all on the shelf and I almost only mill with 1- and 2-flute cutters, partly because they give me feed rates that I can realize. [Here is a list of cutters I use.]({{ '/parts/electronic_parts/' | relative_url }}){:target="_blank"}
 
 That's it for now, I hope it wasn't too long! 
-If you have questions or comments feel free to join our [facebook group!](/parts/electronic_parts/){:target="_blank"}
+If you have questions or comments feel free to join our [facebook group!]({{ '/parts/electronic_parts/' | relative_url }}){:target="_blank"}
 
 Happy milling!
 

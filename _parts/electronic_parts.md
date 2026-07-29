@@ -33,7 +33,7 @@ Estlcam is easy to setup, inexpensive (50€ after a long trial phase) and has s
 | Estlcam Controller (Estlcam)  |        1            |         [ebay](https://ebay.us/pGOJKs){:target="_blank"}            |        
 | Open CNC Shield (Estlcam)  |        1           |            [Timo's Blog](https://blog.altholtmann.com/en/open-cnc-shield-2/){:target="_blank"}      |      
 
-![soldering](/assets/images/soldering.jpg)
+![soldering]({{ '/assets/images/soldering.jpg' | relative_url }})
 
 If you choose to build the Open CNC Shield, a PCB holder is really helpful. You can [print one](https://www.thingiverse.com/thing:965574){:target="_blank"} yourself, I was impatient and bought one from [Amazon](https://amzn.to/3yi68IA){:target="_blank"}. A [suction pump](https://amzn.to/2Ttho66){:target="_blank"} for de-soldering is also a good idea. And your soldering iron should have a bit more power (>=60W): I already had an [ERSA station](https://amzn.to/3AlwtHt){:target="_blank"} from other projects, but a [cheap variant](https://amzn.to/3hrppAo){:target="_blank"} should also do the job. Don't forget beverages. 
 
@@ -109,7 +109,7 @@ All mentioned spindles use so-called ER11 collets (the connector between spindle
 
 ### Milling Cutters
 
-- I would recommend to start only with 1- or 2-flute cutters (flute = cutting edge). I write about why [in a separate post](/start/2021/08/01/SpeedsAndFeeds) since this goes right into the rabbit hole of milling theory and takes a bit more space.
+- I would recommend to start only with 1- or 2-flute cutters (flute = cutting edge). I write about why [in a separate post]({{ '/start/2021/08/01/SpeedsAndFeeds.html' | relative_url }}) since this goes right into the rabbit hole of milling theory and takes a bit more space.
 - Another important rule of thumb is that your cutters should be as short and thick as possible to maximize stiffness.
 - A high quality cutter can cost up to hundreds of €/$. Since destroying cutting bits is an obligatory side effect of learning how it's done, I would highly recommend to start with cheap ones from China where you can get a bit for roughly 2€/$. It won't stay sharp for long but you will ruin it anyway :)
 
@@ -147,11 +147,11 @@ You will need a digital multimeter, a soldering station, cable cutter, crimp too
 
 Cables coming soon.
 
-<!-- ![soldering](/assets/images/cables.jpg) -->
+<!-- ![soldering]({{ '/assets/images/cables.jpg' | relative_url }}) -->
 
 
 
-[Back to Parts](/parts)
+[Back to Parts]({{ '/parts/' | relative_url }})
 
 ---
 This page contains affiliate links. If you use these links to buy something I may earn a commission at no additional cost to you, which helps me to maintain this website. Thanks.

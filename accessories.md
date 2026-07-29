@@ -19,16 +19,16 @@ I had mechanical switches before, but too often these did not trigger, e.g. beca
 
 These sensors trigger at 4 mm distance with steel, with aluminum you will need to bring them to 2 mm distance. Print the holders (2x the one for X/Y, 1x for Z) and screw them to the profiles (4x M3x10 for X/Y, 2x M3x14 for Z). 
 
-![limit](/assets/images/addons/limitswitches/limitswitch1.jpg)
+![limit]({{ '/assets/images/addons/limitswitches/limitswitch1.jpg' | relative_url }})
 
-![limit](/assets/images/addons/limitswitches/limitswitch5.jpg)
+![limit]({{ '/assets/images/addons/limitswitches/limitswitch5.jpg' | relative_url }})
 
 ## Cable Chains
 
 I bought 15 mm wide cable chains from [eBay](https://ebay.us/12995k){:target="_blank"}, they have enough space for motor cables, limit switches, light, etc. Use the given formula to calculate the required length for your build dimensions (for the length of your frame and the width of your portal). You will need 2 connecting elements per chain. 
 Print the Z axis cable chain holder (the thing that looks like a cracker), the other three ends can be attached directly to the extruded profiles. The "fixature" things help to screw the chain down to the profiles.
 
-![limit](/assets/images/addons/cablechain/cablechain1.jpg)
+![limit]({{ '/assets/images/addons/cablechain/cablechain1.jpg' | relative_url }})
 
 
 
@@ -48,9 +48,9 @@ You will need 6 cylindrical 5x5 mm neodymium magnets from [Aliexpress](https://s
 The cleaner hose I use is from Festool (upper diameter 37.5 mm, lower 34.5 mm, don't know if there's a standard). If your cleaner hose doesn't fit take the step file, fill the hole and put in a new one with your needed specs.
 I used PETG (the spindle gets warm, no PLA!) with 4 perimeters, 20% infill to print the parts.
 
-![limit](/assets/images/addons/vacuum/vacuum1.jpg)
+![limit]({{ '/assets/images/addons/vacuum/vacuum1.jpg' | relative_url }})
 
-![limit](/assets/images/addons/vacuum/vacuum2.jpg)
+![limit]({{ '/assets/images/addons/vacuum/vacuum2.jpg' | relative_url }})
 
 <!-- ## Lighting
 

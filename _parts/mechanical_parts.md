@@ -45,7 +45,7 @@ So compare the prices from banggood vs. quality profiles from Europe/US, for me 
 
 Another important point: The "I-Type slot 5" profiles have tapholes for M5 threads (diameter 4.3 mm). All plates which are screwed to profile ends are prepared for M5. If you buy another system check for the taphole diameter. If needed I can export a set of plate files which are prepared for M6, just send me a message. 
 
-![tools](/assets/images/itype5.jpg)
+![tools]({{ '/assets/images/itype5.jpg' | relative_url }})
 
 | Part Name        | Quantity       | Dimensions       |
 | -------------    |:-------------: | :-----           | -------------: |:-------------:     | -----:           |
@@ -85,7 +85,7 @@ The Cindymill uses ball screws on all axes. There are cheaper solutions but, in 
 
 You need two bearing blocks per ball screw: BK12 and BF12 for SFU1605, BK10 and BF10 for SFU1204. If they are not part of a ball screw set, you will need to order them separately. 
 To be able to attach them to the frame the blocks have to have holes in axial direction. Be sure that the blocks you order have these holes (see image below). 
-![tools](/assets/images/fixedblock1.jpg)
+![tools]({{ '/assets/images/fixedblock1.jpg' | relative_url }})
 
 | Part Name        | Quantity            
 | -------------    |:-------------   | -----:  | -------------: |:-------------:     | -----:      |
@@ -129,7 +129,7 @@ On the top level you will find these spacers for the Z axis:
 
 These parts are really small, you could theoretically mill them but it's not worth the effort. Print them heavy, e.g. 5 perimeters, 25% infill.
 
-![printed_parts](/assets/images/printed_spacers1.jpg)
+![printed_parts]({{ '/assets/images/printed_spacers1.jpg' | relative_url }})
 
 Then there is a folder _"/Spacers_you_could_print/"_ which includes spacers which are also given as DXF files to be milled but could also be printed if not possible otherwise. If you decide to print them, choose very heavy settings, e.g. 5 perimeters, 50% infill.
 
@@ -143,7 +143,7 @@ In the folder _"/Tools/"_ you will find useful helpers for aligning the linear r
 If you don't have a printer yet, I can recommend an [Ender 3 Pro](https://s.click.aliexpress.com/e/_A3jDs8){:target="_blank"} to start. It is generally well respected and has a vital community.
 The [Prusa Mini+](https://shop.prusa3d.com/en/66-original-prusa-mini){:target="_blank"} would eventually be more reliable but is also more expensive.
 
-![printed parts](/assets/images/printed_parts4.jpg)
+![printed parts]({{ '/assets/images/printed_parts4.jpg' | relative_url }})
 
 ## Screws
 
@@ -152,7 +152,7 @@ I order all my screws from one eBay trader (all given ebay links below), it's in
 
 Note that most of the screws are DIN912 ("allen screws") but for the portal you will need 8x M5x25 ISO7380 ("pan head screws") to avoid contact with the frame rails (marked red in the image below). You could also use only ISO7380 instead of DIN912 if you prefer the look but I think they are a bit more expensive..
 
-![pan head screws](/assets/images/panheadscrews.jpg)
+![pan head screws]({{ '/assets/images/panheadscrews.jpg' | relative_url }})
 
 
 ### Frame
@@ -203,7 +203,7 @@ Note that most of the screws are DIN912 ("allen screws") but for the portal you 
 <div class="sketchfab-embed-wrapper"> <iframe title="Cindymill Screws" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="fullscreen; autoplay; vr" xr-spatial-tracking execution-while-out-of-viewport execution-while-not-rendered web-share width="360" height="360" src="https://sketchfab.com/models/facda34b1e9b4363be5d3bd389e1f73b/embed?autospin=1&autostart=1"> </iframe> </div>
 
 
-<!-- ![tools](/assets/images/screws1.png) -->
+<!-- ![tools]({{ '/assets/images/screws1.png' | relative_url }}) -->
 
 ### Total
 
@@ -248,12 +248,12 @@ Another very important tool is a dial indicator which is used to align the axes 
 | Mitutoyo Dial Indicator |    1              |   [Amazon](https://amzn.to/36hPEUS){:target="_blank"}  | [ebay](https://ebay.us/ofJ08A){:target="_blank"}  
 | Magnetic Measuring Stand |    1             |   [Amazon](https://amzn.to/3edP8vB){:target="_blank"}  | [ebay](https://ebay.us/9AoXCm){:target="_blank"}  | [Aliexpress](https://s.click.aliexpress.com/e/_A1mxlw){:target="_blank"}    |
 
-![tools](/assets/images/tools.jpg)
+![tools]({{ '/assets/images/tools.jpg' | relative_url }})
 
 
 
 
-[Back to Parts](/parts)
+[Back to Parts]({{ '/parts/' | relative_url }})
 
 ---
 
