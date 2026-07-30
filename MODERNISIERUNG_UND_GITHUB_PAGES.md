@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 30.07.2026 (Rev. 9 — AP 0, 1, 2, 3, 4, 5 und 6 ausgeführt; AP 7.0 vorgezogen, Branch gepusht, CI 2× grün)
+**Stand:** 30.07.2026 (Rev. 10 — AP 0–6 ausgeführt; AP 7.0 und 7.3-Readmes vorgezogen, Branch gepusht, CI 3× grün)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -634,7 +634,7 @@ Zusätzlich, weil „0 Fehler" allein nichts beweist (die Lehre aus Befund M):
 - **`jekyll serve` gegengeprüft**, weil `url()` in CSS von keinem Prüfer erfasst wird: `/Cindymill/`, `main.css`, `fira-sans-normal-400-latin.woff2` (`font/woff2`) und ein Galeriebild antworten alle mit 200.
 - **Kein Mixed Content mehr:** 0 Treffer für `src="http://` und `href="http://` im gesamten Build.
 
-**Offen aus AP 4:** nichts. Weitergegeben an AP 5: die fünf Fremd-Badges (Befund L). Weitergegeben an AP 7.3: `README.md` enthält denselben `http://`-CC-Link — die Datei ist vom Build ausgeschlossen und wird dort ohnehin neu gefasst.
+**Offen aus AP 4:** nichts. Weitergegeben an AP 5: die fünf Fremd-Badges (Befund L). ~~Weitergegeben an AP 7.3~~ ✅ **erledigt am 30.07.2026**: der `http://`-CC-Link im `README.md` steht jetzt auf `https://`, die Datei ist neu gefasst.
 
 ### AP 5 — Datenschutz & Rechtstexte ✅ ausgeführt (30.07.2026)
 
@@ -746,7 +746,7 @@ Zusätzlich, weil html-proofer für diese Fragen blind ist:
 
 **Offen aus AP 5:** die Entscheidung zu Klick-zum-Laden bei Sketchfab (oben). **Weitergegeben:**
 
-- an **AP 7.3**: die drei `Readme.md` unter `model/` verlinken noch `http://www.cindymill.xyz` (`model/Tools/`, `model/Accessories/`, `model/10mm_Milled_Aluminum_Version/Spacers/`). Sie sind vom Build ausgeschlossen, gehören aber zu den eigenen Verweisen, die vor der Kündigung umzubiegen sind. In `model/Accessories/Readme.md` zeigt der Link zusätzlich auf `/addons`, während der Linktext `/accessories` sagt.
+- ~~an **AP 7.3**~~ ✅ **erledigt am 30.07.2026**: die drei `Readme.md` unter `model/` (`model/Tools/`, `model/Accessories/`, `model/10mm_Milled_Aluminum_Version/Spacers/`) zeigen auf die Pages-Adresse. Der Text/Ziel-Widerspruch in `model/Accessories/Readme.md` ist aufgelöst — `/addons` hat es im Build nie gegeben, der Linktext nannte mit `/accessories` das richtige Ziel. Siehe Ergebnisbericht zu AP 7.3.
 - an **AP 8.4**: in `_posts/2021-08-01-SpeedsAndFeeds.md` zeigt der Link „join our facebook group!" auf `/parts/electronic_parts/` statt auf die Facebook-Gruppe, ein zweiter Link im selben Absatz („Here is a list of cutters I use.") auf dasselbe Ziel. Vorbestehend seit dem ersten Commit (`74e6bbf`), also **nicht** von AP 2 verursacht — nachgeprüft. Inhaltsfehler wie Befund J, aber ohne die dort vorhandene eindeutige Konvention: welches Ziel gemeint war, muss der Autor entscheiden.
 
 ### AP 6 — GitHub-Actions-Workflow ✅ ausgeführt (30.07.2026)
@@ -872,10 +872,47 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 1. Branch `website-migration` nach `main` mergen und pushen, Workflow deployt → Site läuft unter `https://culturalheritagedigital.github.io/Cindymill/`.
 2. **Vollständig durchklicken:** alle 27 Seiten, Galerie, beide CAD-Downloads, Blog-Paginierung, `atom.xml`, `404`. HTTPS ist über das `*.github.io`-Wildcard-Zertifikat automatisch aktiv — nichts zu konfigurieren.
 3. **Externe Verweise auf die alte Domain umbiegen**, solange sie noch erreichbar ist:
-   - `README.md` im Repo-Root — verlinkt aktuell `www.cindymill.xyz` und beschreibt nur die Maschine. Neu fassen: Website *und* Modelldaten unter `model/`, neuer Link auf die Pages-URL.
-   - das „Website"-Feld in den Repo-Einstellungen (zeigt auf `www.cindymill.xyz`)
-   - eigene Profile, Foren-Signaturen, YouTube-Beschreibungen, Thingiverse/Printables-Einträge
-   - der Zenodo-DOI-Eintrag (`10.5281/zenodo.5118794`) verweist auf das Repo — Metadaten prüfen
+   - ✅ `README.md` im Repo-Root — neu gefasst, siehe unten.
+   - ✅ die drei `Readme.md` unter `model/` (aus AP 5 hierher gegeben) — siehe unten.
+   - ⬜ das „Website"-Feld in den Repo-Einstellungen. **Korrektur:** Es zeigt *nicht* auf `www.cindymill.xyz`, sondern ist **leer** (`gh api …/Cindymill --jq .homepage` → `null`). Zu setzen ist es trotzdem — sinnvollerweise erst nach AP 7.1, wenn die Pages-URL wirklich antwortet.
+   - ⬜ eigene Profile, Foren-Signaturen, YouTube-Beschreibungen, Thingiverse/Printables-Einträge
+   - ⬜ der Zenodo-DOI-Eintrag (`10.5281/zenodo.5118794`) verweist auf das Repo — Metadaten prüfen. Der Eintrag ist live (`status: published`, Titel „culturalheritagedigital/Cindymill: Cindymill DIY open source CNC milling machine"); die 403 beim reinen `curl`-Abruf ist Bot-Abwehr, kein toter Link.
+
+#### Ergebnis AP 7.3 — Readme-Dateien (30.07.2026), Commit `c3ba058`
+
+Vorgezogen vor den Merge, weil die Dateien unabhängig vom Deployment sind. **Es waren genau vier Stellen** — die Jekyll-Quellen sind seit AP 5 frei von `cindymill.xyz`, gegengeprüft mit `git grep` über das ganze Repo (ohne dieses Dokument, wo die Domain als Befundtext steht).
+
+| Datei | vorher | nachher |
+|---|---|---|
+| `model/Tools/Readme.md` | `[www.cindymill.xyz](http://www.cindymill.xyz)` | Pages-Wurzel |
+| `model/10mm_Milled_Aluminum_Version/Spacers/Readme.md` | dito | Pages-Wurzel |
+| `model/Accessories/Readme.md` | Text `/accessories`, Ziel `/addons` | `…/Cindymill/accessories.html` |
+| `README.md` | `[www.cindymill.xyz](http://www.cindymill.xyz)` | Pages-Wurzel + zwei neue Abschnitte |
+
+**`model/Accessories/Readme.md` war doppelt kaputt.** Der aus AP 5 gemeldete Text/Ziel-Widerspruch löst sich eindeutig auf: eine Seite `addons` hat der Build **nie** erzeugt (`_site/` kennt nur `accessories.html`; die alte Namensgebung überlebt nur in `assets/images/addons/`). Der Link war also schon auf der alten Seite tot, und der *Linktext* nannte das richtige Ziel. Kein Erfinden nötig — dieselbe Lage wie bei Befund J.
+
+**`README.md` neu gefasst.** Der Plan verlangte „Website *und* Modelldaten unter `model/`". Umgesetzt als zwei neue Abschnitte:
+
+- **Documentation** — Link auf die Pages-URL, plus ein Satz, dass das Projekt früher unter `www.cindymill.xyz` lag und diese Adresse aufgegeben ist. Das ist die einzige verbliebene Nennung der alten Domain im Repo, und zwar bewusst: sie steht als Fließtext in Backticks, nicht als Link, und hilft jedem mit einem alten Lesezeichen.
+- **What is in this repository** — Tabelle `model/` vs. Root, dazu ein hervorgehobener Hinweis für die **14 Forks**: Pfade von vor dem Umbau brauchen `model/` davor, die Git-Historie jeder Datei ist über die Renames intakt. Das ist die einzige Gegenmaßnahme zum Risiko „Links auf CAD-Dateien brechen durch den `model/`-Umbau", die überhaupt in eigener Hand liegt.
+
+Zwei Altlasten fielen mit: der aus AP 4 hierher gegebene `http://`-CC-Link (→ `https://`, dasselbe Ziel) und die Referenzdefinition `[cc-by-nc-sa-shield]`, die von keiner Stelle benutzt wird — genau die, die AP 5 schon aus `index.html` entfernt hat.
+
+> **Die Fremd-Badges bleiben im `README.md` remote** (shields.io, licensebuttons.net, zenodo.org), anders als auf der Website in AP 5. Der Grund ist nicht Bequemlichkeit: GitHub rendert README-Bilder über den eigenen Camo-Proxy, die Besucher-IP erreicht die fremden Hosts also gar nicht — das Datenschutzargument aus Befund L greift hier nicht. Dafür bleibt der Zenodo-Badge aktualisierbar, was er auf der Website mit dem Lokalisieren verloren hat.
+
+**Verifikation.** Alle acht externen Links der vier Dateien einzeln abgerufen:
+
+```
+200  creativecommons.org/licenses/by-nc-sa/4.0/     (jetzt https)
+200  licensebuttons.net/…/88x31.png
+200  img.shields.io/badge/PayPal-…
+200  www.paypal.me/NikoPlath
+403  zenodo.org (Badge + doi.org)   → Bot-Abwehr, Eintrag per API als published bestaetigt
+404  culturalheritagedigital.github.io/Cindymill/            → erwartet, deployt erst AP 7.1
+404  culturalheritagedigital.github.io/Cindymill/accessories.html   → dito
+```
+
+Beide 404-Ziele existieren im gebauten `_site/` (`index.html`, `accessories.html`) — sie werden mit dem ersten Deployment gültig. Ebenso geprüft: die lokalen Ziele `cindymill_front_1.jpg`, `model/` und `model/Tools/alignment_tools.jpg` sind vorhanden.
 4. **Backup gegenprüfen:** Ist `2026_Backup_Website_Cindymill_Ionos` vollständig, und sind die Ionos-Vertrags-/Zugangsdaten gesichert (AP 0.1)? Nach der Kündigung ist beides nicht mehr abrufbar.
 5. **Erst danach bei Ionos kündigen:** Hosting-Paket **und** Domain `cindymill.xyz`. Kündigungsfrist und Vertragsende beachten — Ionos kündigt Domains üblicherweise zum Laufzeitende; bis dahin bleibt die alte Seite ggf. erreichbar.
 6. Nach Ablauf: Ionos-Zugangsdaten aus dem Passwortmanager entfernen bzw. archivieren.
@@ -903,7 +940,7 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | ✅ SEO-Metadaten gültig, kein Tracking, Schrift self-hosted, Bildmaße im Build |
 | 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | ✅ Analytics- und LinkedIn-Abschnitt raus, Hosting = GitHub, Badges lokal, Affiliate-Hinweise vollständig |
 | 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | ✅ `.github/workflows/pages.yml`, alle 4 Vorgaben umgesetzt, 2 Wächter mit Gegentest, **auf GitHub 2× grün gelaufen** |
-| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | AP 7.0 ✅ (Probelauf grün), ab 7.1 offen — der Merge nach `main` deployt |
+| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | AP 7.0 ✅ (Probelauf grün), 7.3-Readmes ✅; offen: 7.1 Merge/Deploy, Repo-Website-Feld, Zenodo, Kündigung |
 | 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h | offen |
 
 > **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
@@ -937,7 +974,7 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | Bild-Optimierung zerstört Bildqualität | niedrig | Originale liegen im Backup (nicht im Repo), Stichproben visuell prüfen |
 | Personenbezogene Daten im öffentlichen Repo | niedrig, aber gravierend | `logs/` liegt bereits nur im Backup; vor dem ersten Push manuell prüfen und Git-History kontrollieren |
 | Kündigung vor funktionierendem Ersatz | niedrig | Reihenfolge in AP 7 strikt einhalten: erst Site live und geprüft, dann kündigen |
-| **Links auf CAD-Dateien brechen durch den `model/`-Umbau** | mittel | Folge der Umwidmung. Eigene Verweise (README, Website, Foren) mit umbiegen; die 14 Forks behalten die alte Struktur und sind nicht erreichbar. Der Umzug ist von Git als Rename erfasst, die Historie bleibt also nachvollziehbar. |
+| **Links auf CAD-Dateien brechen durch den `model/`-Umbau** | mittel, teilweise abgefedert | Folge der Umwidmung. Die 14 Forks behalten die alte Struktur und sind nicht erreichbar. Seit AP 7.3 erklärt die `README.md` den Umbau ausdrücklich und sagt, dass alte Pfade ein `model/` davor brauchen — mehr ist von hier aus nicht möglich. Der Umzug ist von Git als Rename erfasst, die Historie bleibt nachvollziehbar. |
 | Repo-Root vermischt Website und Modelldaten | niedrig | `exclude:` in `_config.yml` hält `model/` aus dem Build; bei jedem neuen Root-Element nachziehen. `htmlproofer` im CI deckt Fehlkonfigurationen auf. |
 
 ---
@@ -989,9 +1026,10 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] Auf dem Runner belegt: `_plugins/` greift (181/181 `<img>` mit Maßen), Lockdatei nicht nachgelöst, 0 Annotationen nach dem Action-Bump
 - [ ] GitHub-Actions-Workflow deployt, htmlproofer meldet 0 tote interne Links
 - [ ] Site unter `culturalheritagedigital.github.io/Cindymill/` vollständig durchgeklickt
-- [ ] `README.md` neu gefasst (Website + `model/`, Link auf die Pages-URL)
-- [ ] Externe Verweise auf cindymill.xyz umgebogen (Repo-Website-Feld, Zenodo, Profile, Foren)
-- [ ] Die drei `Readme.md` unter `model/` auf die neue Adresse umgebogen (aus AP 5 an AP 7.3 gegeben)
+- [x] `README.md` neu gefasst (Website + `model/`, Pages-URL, Fork-Hinweis, `http://`-CC-Link und ungenutzte Shield-Referenz raus)
+- [ ] Externe Verweise auf cindymill.xyz umgebogen — Repo-Website-Feld (ist **leer**, nicht falsch gesetzt), Zenodo-Metadaten, Profile, Foren
+- [x] Die drei `Readme.md` unter `model/` umgebogen; toter `/addons`-Link auf `accessories.html` korrigiert
+- [x] `git grep` über das ganze Repo: **0** verbliebene `cindymill.xyz`-Links (die eine Textnennung im `README.md` ist Absicht)
 - [ ] Fehlleitender Link „join our facebook group!" in `SpeedsAndFeeds` (aus AP 5 an AP 8.4 gegeben)
 - [ ] Ionos-Hosting-Paket gekündigt
 - [ ] Ionos-Domain `cindymill.xyz` gekündigt
