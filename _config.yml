@@ -1,0 +1,120 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+lang: en-US
+title: Cindymill
+email: cindymill@culturalheritage.digital
+description: "A gentle way to start your journey into CNC milling."
+# Grosses C: GitHub Pages bildet den Repository-Namen unveraendert auf den
+# Pfad ab, /cindymill liefert 404.
+baseurl: "/Cindymill"
+url: "https://culturalheritagedigital.github.io"
+author:
+  name: Niko Plath
+  twitter: 
+  picture: /assets/images/cindymill_2.jpg
+twitter_username: 
+github_username: culturalheritagedigital/cindymill
+logo: #/assets/icons/basically-basic-logo-light.svg
+
+# Kein google_analytics: Die Seite trackt nicht. Waere der Schluessel gesetzt,
+# zoege _includes/scripts.html unter JEKYLL_ENV=production wieder
+# _includes/google-analytics.html nach (AP 4/5).
+
+# Liquid
+liquid:
+  error_mode: strict
+
+# Sass (jekyll-sass-converter 3.x / sass-embedded)
+sass:
+  # Keine main.css.map ausliefern - sie war bisher oeffentlich abrufbar (218 KB).
+  sourcemap: never
+  # Das vendorte Theme (inkl. susy/breakpoint) nutzt @import, slash-div,
+  # lighten() und globale Sass-Builtins. Das sind Deprecations, keine Fehler:
+  # sie warnen auf Dart Sass 3.0 vor. Bis dahin wuerden sie jeden Build mit
+  # ~230 Zeilen Rauschen fluten und echte Meldungen verdecken.
+  # jekyll-sass-converter ~> 3.0 verlangt sass-embedded ~> 1.75 (< 2.0),
+  # der Bruch kann also nicht unbemerkt einziehen.
+  quiet_deps: true
+
+# Build settings
+markdown: kramdown
+
+# Kein theme:/remote_theme: - das Theme "basically-basic" 1.4.5 ist seit 2019
+# unmaintained und liegt seit AP 3.4 vendort im Repo (_layouts/, _sass/,
+# _includes/, assets/stylesheets/main.scss, assets/javascripts/main.js).
+
+plugins: # previously gems
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-paginate
+feed:
+  path: atom.xml
+
+# Pagination - https://jekyllrb.com/docs/pagination/
+paginate: 10
+paginate_path: /page:num/
+
+# Exclude from processing.
+# Achtung: Eine eigene exclude-Liste ersetzt Jekylls Standardliste vollstaendig,
+# deshalb sind die Standardeintraege hier mit aufgefuehrt.
+exclude:
+  # Modell-/CAD-Daten des Repositories - gehoeren nicht in die gebaute Website
+  - model/
+  - README.md
+  - LICENSE
+  - cindymill_front_1.jpg
+  # Projektinterne Dokumentation
+  - MODERNISIERUNG_UND_GITHUB_PAGES.md
+  # Jekyll-Standardliste
+  - Gemfile
+  - Gemfile.lock
+  - .ruby-version
+  - gemfiles/
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+# Collections
+collections:
+  assembly:
+    output: true
+    permalink: /:collection/:path/
+  parts:
+    output: true
+    permalink: /:collection/:path/
+
+
+# Front Matter Defaults
+defaults:
+  # _assembly
+  - scope:
+      path: "_assembly"
+      type: assembly
+    values:
+      layout: post
+      read_time: true
+  # _parts
+  - scope:
+      path: "_parts"
+      type: parts
+    values:
+      layout: post
+      read_time: true
+
+#copyright: <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.

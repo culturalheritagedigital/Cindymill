@@ -1,0 +1,51 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% if site.plugins contains 'jekyll-seo-tag' or site.gems contains 'jekyll-seo-tag' %}
+    {% comment %}
+      Add metadata for search engines and social networks if jekyll-seo-tag plugin is enabled
+    {% endcomment %}
+    {% include head-seo.html %}
+  {% else %}
+    <title>{% if page.title %}{{ page.title | escape }}{% else %}{{ site.title | escape }}{% endif %}</title>
+    <meta name="description" content="{{ page.excerpt | default: site.description | strip_html | normalize_whitespace | truncate: 160 | escape }}">
+    <link rel="canonical" href="{{ page.url | replace:'index.html', '' | absolute_url }}">
+  {% endif %}
+
+  {% comment %}
+    Fira Sans wird selbst ausgeliefert (assets/fonts/, @font-face in
+    _sass/cindymill/_fonts.scss). Kein Google-Fonts-Aufruf: kein
+    Drittserver-Request mit IP-Uebertragung, kein Render-Blocker.
+    Vorgeladen wird nur der Regular-Schnitt im Latin-Subset - er traegt den
+    Fliesstext; die uebrigen Schnitte holt der Browser bei Bedarf nach.
+  {% endcomment %}
+  <link rel="preload" href="{{ '/assets/fonts/fira-sans-normal-400-latin.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ '/assets/stylesheets/main.css' | relative_url }}">
+
+  {% if site.plugins contains 'jekyll-feed' or site.gems contains 'jekyll-feed'%}
+    {% comment %}
+      Add Atom feed link if jekyll-feed plugin is enabled
+    {% endcomment %}
+    {% include head-feed.html %}
+  {% endif %}
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/images/favicons/apple-touch-icon.png' | relative_url }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ '/assets/images/favicons/favicon-32x32.png' | relative_url }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ '/assets/images/favicons/favicon-16x16.png' | relative_url }}">
+  <link rel="manifest" href="{{ '/assets/images/favicons/site.webmanifest' | relative_url }}">
+  <link rel="mask-icon" href="{{ '/assets/images/favicons/safari-pinned-tab.svg' | relative_url }}" color="#5bbad5">
+  <link rel="shortcut icon" href="{{ '/assets/images/favicons/favicon.ico' | relative_url }}">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-config" content="{{ '/assets/images/favicons/browserconfig.xml' | relative_url }}">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- eBay-Partnernetzwerk: Verifizierung der Seite (content= statt value=) -->
+  <meta name="ir-site-verification-token" content="276008534">
+
+  {% comment %}
+    Kein Analytics. Der frueher hier hart codierte GA4-Tag G-6J78SX32JE ist
+    entfernt, ebenso site.google_analytics in _config.yml (AP 4/5).
+  {% endcomment %}
+</head>

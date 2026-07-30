@@ -1,0 +1,119 @@
+# Baut die Jekyll-Website und veroeffentlicht sie auf GitHub Pages.
+#
+# Warum ein eigener Workflow und nicht der klassische Pages-Jekyll-Build:
+#   - Der klassische Build ist auf Jekyll 3.9 festgenagelt, hier laeuft 4.4.
+#   - Das Theme "basically-basic" steht nicht auf GitHubs Themenliste
+#     (es liegt seit AP 3.4 vendort im Repo).
+#   - Entscheidend: der klassische Build ignoriert _plugins/ - und zwar ohne
+#     Fehlermeldung. _plugins/image_attributes.rb setzt width/height/loading/
+#     decoding an allen <img>. Ohne das Plugin baut die Seite durch, sieht
+#     fast gleich aus und hat still keine Bildmasse mehr.
+# Aus demselben Grund darf hier nie --safe an den Build-Aufruf.
+
+name: Build & Deploy Pages
+
+on:
+  push:
+    branches:
+      - main
+      # Vor dem Livegang (AP 7.1) laeuft die Pruefung auch auf dem
+      # Migrationsbranch - deployt wird von dort nicht, siehe Job "deploy".
+      - website-migration
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Ein Deployment zur Zeit; laufende Deployments nicht abbrechen.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  JEKYLL_ENV: production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Ruby einrichten
+        uses: ruby/setup-ruby@v1
+        with:
+          # Liest .ruby-version (3.4) - lokaler Build und CI bleiben identisch.
+          ruby-version: '.ruby-version'
+          bundler-cache: true
+
+      - name: Build
+        run: bundle exec jekyll build
+
+      # Der wichtigste Schritt: genau so waeren die 73 Backslash-Links aus
+      # Befund A nie live gegangen. Externe Links bleiben aussen vor
+      # (Laufzeit; 115 Amazon-, 102 eBay-, 94 AliExpress-Links).
+      #
+      # --swap-urls ist zwingend: baseurl "/Cindymill" steht seit AP 4
+      # dauerhaft in _config.yml, ohne den Schalter meldet html-proofer
+      # jeden korrekten Pfad als Fehler.
+      #
+      # Abbruchkriterium ist der Exit-Code, nicht die letzte Ausgabezeile
+      # (Befund M: der Lauf schrieb "finished successfully" und hatte
+      # trotzdem 4 Fehler gefunden). "set -e" der Shell erledigt das.
+      - name: html-proofer (interne Links, Bilder, Skripte)
+        run: bundle exec htmlproofer ./_site --disable-external --swap-urls '^/Cindymill/:/'
+
+      # Zwei stumpfe Pruefungen fuer die zwei Fehlerklassen, die dieser
+      # Umzug als "lokal unsichtbar" kennengelernt hat.
+      - name: Waechter 1 - kein Asset-Pfad ohne baseurl
+        # html-proofer ist hier nachweislich blind (Befund Q): es loest
+        # src="/assets/..." gegen die Wurzel von _site/ auf, wo die Datei
+        # existiert. Live liegt die Wurzel aber unter /Cindymill/.
+        run: |
+          if grep -rEn '(src|href)="/assets/' _site; then
+            echo "::error::Asset-Pfad ohne baseurl im Build (siehe Treffer oben). Fehlt ein | relative_url?"
+            exit 1
+          fi
+          echo "OK: kein (src|href)=\"/assets/ im Build."
+
+      - name: Waechter 2 - _plugins ist gelaufen
+        # Belegt, dass _plugins/image_attributes.rb gegriffen hat. Faellt es
+        # aus (--safe, klassischer Pages-Build), verschwinden die Attribute
+        # kommentarlos. Erwartung nach AP 5: 181 von 181 <img> vollstaendig.
+        run: |
+          total=$(grep -rohE '<img[^>]*>' _site --include='*.html' | wc -l | tr -d ' ')
+          bad=$(grep -rohE '<img[^>]*>' _site --include='*.html' \
+                | grep -cvE 'width="[^"]+".*height="[^"]+"|height="[^"]+".*width="[^"]+"' || true)
+          echo "$total <img> im Build, davon $bad ohne width/height."
+          if [ "$total" -eq 0 ] || [ "$bad" -ne 0 ]; then
+            echo "::error::Bildmasse fehlen - lief _plugins/image_attributes.rb? (kein --safe, kein klassischer Pages-Build)"
+            exit 1
+          fi
+
+      # Achtung bei kuenftigen Updates: seit v4 nimmt diese Aktion
+      # Dotfiles NICHT mehr ins Artefakt auf. Hier folgenlos - der Build
+      # enthaelt keine (gegen `find _site -name '.*'` geprueft, 0 Treffer
+      # bei 217 Dateien). Kaeme jemals eine dazu, fiele sie still aus dem
+      # Deployment; dann `include-hidden-files: true` setzen.
+      - name: Artefakt hochladen
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./_site
+
+  deploy:
+    # Nur von main aus veroeffentlichen. Push auf website-migration und
+    # Pull Requests durchlaufen oben nur Build und Pruefung.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages veroeffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v5

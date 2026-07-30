@@ -1,0 +1,98 @@
+// Fira Sans - selbst ausgeliefert (AP 4)
+//
+// Ersetzt die Einbindung ueber fonts.googleapis.com: kein Request an einen
+// Drittserver, keine Uebertragung der Besucher-IP an Google (LG Muenchen I,
+// 3 O 17493/20), kein render-blockierendes Stylesheet aus fremder Hand.
+//
+// Quelle: Google Fonts (Fira Sans v18), SIL Open Font License 1.1.
+// Lizenztext liegt als assets/fonts/Fira_Sans-OFL.txt bei.
+//
+// Die Pfade sind relativ zum Ausgabeort von main.css
+// (/assets/stylesheets/) und damit unabhaengig vom baseurl - Liquid wird in
+// Sass-Partials nicht ausgewertet.
+//
+// unicode-range trennt latin und latin-ext: Der Browser laedt latin-ext nur,
+// wenn ein Zeichen daraus tatsaechlich vorkommt. Die Datei kostet also nichts,
+// solange sie nicht gebraucht wird.
+//
+// font-display: swap - Text ist sofort in der Systemschrift lesbar und wird
+// nach dem Laden umgestellt, statt bis zu 3 s unsichtbar zu bleiben.
+
+$fira-latin-ext: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+  U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+  U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+$fira-latin: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+  U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+  U+2212, U+2215, U+FEFF, U+FFFD;
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/fira-sans-normal-400-latin.woff2') format('woff2');
+  unicode-range: $fira-latin;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/fira-sans-normal-400-latin-ext.woff2') format('woff2');
+  unicode-range: $fira-latin-ext;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/fira-sans-italic-400-latin.woff2') format('woff2');
+  unicode-range: $fira-latin;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/fira-sans-italic-400-latin-ext.woff2') format('woff2');
+  unicode-range: $fira-latin-ext;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/fira-sans-normal-600-latin.woff2') format('woff2');
+  unicode-range: $fira-latin;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/fira-sans-normal-600-latin-ext.woff2') format('woff2');
+  unicode-range: $fira-latin-ext;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/fira-sans-italic-600-latin.woff2') format('woff2');
+  unicode-range: $fira-latin;
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/fira-sans-italic-600-latin-ext.woff2') format('woff2');
+  unicode-range: $fira-latin-ext;
+}

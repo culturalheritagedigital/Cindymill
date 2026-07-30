@@ -1,0 +1,20 @@
+# Jekyll
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+
+# Bundler - bewusst auf den Repo-Root verankert (fuehrender Slash).
+# Ohne ihn wuerde "vendor/" auch _sass/basically-basic/vendor/ (susy,
+# breakpoint) schlucken: 38 Dateien, die das vendorte Theme zum Bauen
+# braucht. Lokal faellt das nicht auf, der CI-Build bricht.
+/.bundle/
+/vendor/
+
+# macOS
+.DS_Store
+
+# Ionos-Altlasten (dürfen nie ins öffentliche Repo)
+logs/
+*.log
+.htaccess
