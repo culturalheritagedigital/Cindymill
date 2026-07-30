@@ -4,4 +4,4 @@ This section covers various (mostly printed) accessories which make the machine 
 
 You will find descriptions about the individual parts here:
 
-[http://www.cindymill.xyz/accessories](http://www.cindymill.xyz/addons)
+[Accessories page on the Cindymill website](https://culturalheritagedigital.github.io/Cindymill/accessories.html)
