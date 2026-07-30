@@ -9,9 +9,9 @@ Information in accordance with Section 5 TMG
 <h2>Contact Information</h2>
 <p>Niko Plath
 <!-- <br>culturalheritage.digital -->
-<br>Lerchenstr. 81<br>22767 Hamburg<br>
+<br>Alter Oßweiler Weg 47<br>71638 Ludwigsburg<br>
 
-Telephone: +4940858878<br>E-Mail: <a href="mailto:cindymill@culturalheritage.digital">cindymill@culturalheritage.digital</a><br>Internet address: <a href="https://culturalheritagedigital.github.io/Cindymill/">culturalheritagedigital.github.io/Cindymill</a><br><br>
+Telephone: +49 7141 9926683<br>E-Mail: <a href="mailto:cindymill@culturalheritage.digital">cindymill@culturalheritage.digital</a><br>Internet address: <a href="https://culturalheritagedigital.github.io/Cindymill/">culturalheritagedigital.github.io/Cindymill</a><br><br>
 
 <h2>Hosting</h2>
 <p>This website is hosted as a static site on GitHub Pages by GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States, a subsidiary of Microsoft Corporation. Details on the processing of visitor data by the hosting provider are set out in section 3 of the Privacy Policy below.</p>
@@ -93,10 +93,10 @@ The materials from these pages are copyrighted and any unauthorized use may viol
 </p>
 
 <p>Niko Plath</p>
-<p>Lerchenstr., 81</p>
-<p>22767 Hamburg</p>
+<p>Alter Oßweiler Weg 47</p>
+<p>71638 Ludwigsburg</p>
 <p>Germany</p>
-<p>Phone: 040858878</p>
+<p>Phone: +49 7141 9926683</p>
 <p>Email: cindymill@culturalheritage.digital</p>
 <p>Website: https://culturalheritagedigital.github.io/Cindymill/</p>
 
