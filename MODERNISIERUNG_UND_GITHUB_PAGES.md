@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 30.07.2026 (Rev. 8 — AP 0, 1, 2, 3, 4, 5 und 6 ausgeführt)
+**Stand:** 30.07.2026 (Rev. 9 — AP 0, 1, 2, 3, 4, 5 und 6 ausgeführt; AP 7.0 vorgezogen, Branch gepusht, CI 2× grün)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -328,14 +328,14 @@ Das hat drei Konsequenzen, die im weiteren Plan berücksichtigt sind:
 | 7 | Website-Quellcode aufnehmen | ✅ Commit `74e6bbf`, 116 Dateien, **ohne `assets/`** |
 | 8 | `exclude:` in `_config.yml` setzen | ✅ `model/`, `README.md`, `LICENSE`, `cindymill_front_1.jpg`, Projektdoku + Jekyll-Standardliste |
 | 9 | GitHub CLI installieren | ✅ `gh` 2.96.0 via Homebrew |
-| 10 | `gh auth login` | ⬜ **offen — muss interaktiv ausgeführt werden** |
+| 10 | `gh auth login` | ✅ 30.07.2026 — Konto `culturalheritagedigital`, Scopes `repo`, `workflow`, `read:org`, `gist` |
 | 11 | Ionos-Vertragsdaten sichern | ⬜ **offen** — Paket, Domain-Auth-Code, Kündigungsfristen, Rechnungen ins Backup. Nach der Kündigung ist der Zugang weg. |
 
 **Wichtige Abweichung von Rev. 2:** Dort war ein frisches `git init` vorgesehen. Da die Website in das *bestehende* Repo zieht, wäre das falsch gewesen — es hätte die 54 Commits, die Sterne und die Forks verworfen. Stattdessen wurde das vorhandene Repo als `origin` angebunden und die Historie fortgeschrieben.
 
 **`assets/` fehlt bewusst im Commit.** Erst AP 1 ausführen, dann `git add assets/`. Andernfalls lägen die 708 MB verworfener Dateien dauerhaft in der Historie und jeder Clone — auch jeder der 14 Forks — zöge sie mit. Der Rollback-Punkt ist das Backup, nicht ein Initial-Commit.
 
-**Noch nicht gepusht.** Branch `website-migration` liegt nur lokal. Der Push ist der erste nach außen sichtbare Schritt und sollte erst erfolgen, wenn AP 1 durch ist — sonst ist ein Zwischenstand mit halb aufgeräumten Assets öffentlich.
+~~**Noch nicht gepusht.**~~ ✅ **Gepusht am 30.07.2026**, nach AP 6 und damit lange nach AP 1 — die Bedingung „erst wenn AP 1 durch ist" war eingehalten, ein Zwischenstand mit halb aufgeräumten Assets war nie öffentlich. Der Push ist der erste nach außen sichtbare Schritt; die dafür verlangte Kontrolle auf personenbezogene Daten steht im Nachtrag zu AP 6. `main` bleibt bis AP 7.1 unangetastet.
 
 ### AP 1 — Asset-Diät (Blocker, vor dem Commit von `assets/`)
 
@@ -826,18 +826,49 @@ Und weil „0 Fehler" allein nichts beweist (die Lehre aus Befund M), beide Wäc
 | 1 | Datei mit `<a href="/assets/x">` | greift, Treffer wird mit Zeilennummer ausgegeben |
 | 2 | `<img src="x.jpg" alt="">` ohne Maße | greift, `bad` = 1 → Abbruch |
 
-> ⚠️ **Was lokal nicht prüfbar ist.** Ob `ruby/setup-ruby` mit `bundler-cache: true` auf `ubuntu-latest` durchläuft, ob das Artefakt korrekt hochgeladen wird und ob `deploy-pages` das Environment bekommt, zeigt erst der erste echte Lauf. Der ist mit dem erweiterten Trigger aber **nicht** mehr an den Livegang gekoppelt: ein Push von `website-migration` löst Build und Prüfung ohne Deployment aus. Genau so ist er in AP 7 einzuplanen.
+Drei Dinge blieben nach der Abgabe lokal unprüfbar: ob `ruby/setup-ruby` mit `bundler-cache: true` auf `ubuntu-latest` durchläuft, ob `_plugins/` dort greift und ob das Artefakt korrekt hochgeladen wird. Sie sind mit dem Probelauf beantwortet — siehe Nachtrag.
 
-**Offen aus AP 6 — beides erfordert interaktive Anmeldung und kann hier nicht ausgeführt werden:**
+#### Nachtrag: AP 7.0 vorgezogen — der Workflow ist real gelaufen (30.07.2026)
 
-1. `gh auth login` (steht schon als AP 0.10 offen) — Voraussetzung für den ersten Push.
-2. **Settings → Pages → Source: „GitHub Actions"** im Repository umstellen. Ohne diese Einstellung schlägt der Job `deploy` fehl (`deploy-pages` findet kein Pages-Environment) — der Job `build` samt aller Prüfungen läuft davon unabhängig durch.
+`gh auth login` und **Settings → Pages → Source: „GitHub Actions"** wurden unmittelbar nach der Abgabe von AP 6 erledigt (bestätigt: `gh api …/pages` meldet `build_type: workflow`, der Token trägt den `workflow`-Scope, ohne den sich eine Workflow-Datei gar nicht pushen ließe). Damit war AP 7.0 sofort ausführbar — und ist ausgeführt.
+
+**Vor dem Push kontrolliert**, weil die Risikotabelle „manuell prüfen" verlangt und nicht „unterstellen":
+
+| Prüfung | Ergebnis |
+|---|---|
+| `logs/`, `.htaccess`, `access.log`, `info.php5`, `htpasswd`, `.env`, Keys — **gesamte** Historie über `--diff-filter=A` | 0 Treffer |
+| Echte IPv4 in den 15 neuen Commits | genau eine: `217.160.0.21`, die öffentliche Ionos-Server-IP als Befund in diesem Dokument. Keine Besucher-IP. Die 32 weiteren Regex-Treffer sind Artikelnummern aus den Stücklisten (`003.02.006.04` u. ä.) |
+| Ionos-Zugangsdaten / htpasswd-Pfad im Klartext | nicht enthalten — Abschnitt 1.5 benennt sie bewusst, ohne sie zu zitieren |
+| Arbeitsbaum / Umfang | sauber; 15 Commits, 10,4 MiB |
+
+Danach `git push -u origin website-migration`. Der Branch ist damit öffentlich, die Live-Site unberührt.
+
+**Lauf 1 — `30525990144`, ✅ grün in 40 s.** Die offenen Fragen sind beantwortet:
+
+```
+ruby 3.4.10 (x86_64-linux)      ← aus .ruby-version, nicht aus dem Workflow
+Bundle complete! 8 Gemfile dependencies, 61 gems now installed.
+                                ← dieselbe Zahl wie lokal; die Lockdatei musste
+                                  nicht nachgelöst werden (s. Korrektur zu AP 3.1)
+Ran on 27 files!  HTML-Proofer finished successfully.
+OK: kein (src|href)="/assets/ im Build.         ← Wächter 1
+181 <img> im Build, davon 0 ohne width/height.  ← Wächter 2
+deploy in 0s                    ← korrekt übersprungen, Branch ≠ main
+```
+
+Die vorletzte Zeile ist der eigentliche Gewinn dieses Laufs: **`_plugins/image_attributes.rb` greift auf dem Runner.** Das war die Unbekannte hinter dem Risiko „Eigenes Plugin wird von einer anderen Build-Umgebung ignoriert" — ein Ausfall hätte durchgebaut und nur still die Bildmaße verloren.
+
+**Eine Annotation, behoben — Lauf 2, `30526171441`, ✅ grün in 17 s** (Bundler-Cache greift). Der erste Lauf meldete `actions/checkout@v4` und das intern genutzte `upload-artifact` als Node.js-20-Aktionen, zwangsweise auf Node 24 ausgeführt. Angehoben auf `checkout@v7`, `upload-pages-artifact@v5`, `deploy-pages@v5`; danach **0 Annotationen**, Wächter unverändert.
+
+> ⚠️ **Beim Anheben von `upload-pages-artifact` wäre beinahe eine stille Regression entstanden.** Seit **v4** nimmt die Aktion **keine Dotfiles mehr ins Artefakt** auf. Läge im Build eine `.well-known/`- oder `.nojekyll`-Datei, wäre sie ab diesem Bump kommentarlos aus dem Deployment gefallen — dieselbe Fehlerklasse wie Befund K. Vor dem Bump geprüft: `find _site -name '.*'` → **0 Treffer bei 217 Dateien**, also folgenlos. Der Befund steht als Kommentar an genau der Stelle im Workflow, samt Ausweg `include-hidden-files: true`.
+
+**Offen aus AP 6:** nichts. Der nächste Schritt ist AP 7.1 — der Merge nach `main`, der zugleich das erste Deployment auslöst.
 
 ### AP 7 — Livegang und Ionos-Kündigung (Reihenfolge einhalten!)
 
 Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 
-0. **Vorher, seit AP 6 möglich:** `gh auth login`, dann **Settings → Pages → Source: „GitHub Actions"** setzen und `website-migration` pushen. Der Workflow läuft dort komplett durch — Build, html-proofer, beide Wächter — **ohne** zu deployen. Erst wenn dieser Lauf grün ist, weiter mit Schritt 1. Damit ist der Livegang nicht mehr zugleich der erste CI-Lauf.
+0. ✅ **Erledigt (30.07.2026).** `gh auth login`, **Settings → Pages → Source: „GitHub Actions"**, Vorab-Kontrolle auf personenbezogene Daten, Push von `website-migration`. Der Workflow lief dort zweimal komplett durch — Build, html-proofer, beide Wächter — **ohne** zu deployen. Details im Nachtrag zu AP 6. Der Livegang ist damit nicht mehr zugleich der erste CI-Lauf.
 1. Branch `website-migration` nach `main` mergen und pushen, Workflow deployt → Site läuft unter `https://culturalheritagedigital.github.io/Cindymill/`.
 2. **Vollständig durchklicken:** alle 27 Seiten, Galerie, beide CAD-Downloads, Blog-Paginierung, `atom.xml`, `404`. HTTPS ist über das `*.github.io`-Wildcard-Zertifikat automatisch aktiv — nichts zu konfigurieren.
 3. **Externe Verweise auf die alte Domain umbiegen**, solange sie noch erreichbar ist:
@@ -865,14 +896,14 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 
 | # | Arbeitspaket | Abhängig von | Aufwand (grob) | Status |
 |---|---|---|---|---|
-| 0 | Repo anbinden, `model/`-Umbau, `.gitignore`, `gh` | — | 1 h | ✅ bis auf `gh auth login` und die Ionos-Vertragsdaten |
+| 0 | Repo anbinden, `model/`-Umbau, `.gitignore`, `gh` | — | 1 h | ✅ bis auf die Ionos-Vertragsdaten (`gh auth login` erledigt) |
 | 1 | Asset-Diät (tote Dateien, Videos, Bildoptimierung) | 0 | 3–4 h | ✅ 913 MB → 62 MB |
 | 2 | Asset-Pfade normalisieren (`relative_url`) | 0 | 2–3 h | ✅ 199 Referenzen + 17 interne Links; html-proofer mit AP 3 nachgeholt: 0 Fehler |
 | 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | ✅ Build läuft, html-proofer 0 Fehler |
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | ✅ SEO-Metadaten gültig, kein Tracking, Schrift self-hosted, Bildmaße im Build |
 | 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | ✅ Analytics- und LinkedIn-Abschnitt raus, Hosting = GitHub, Badges lokal, Affiliate-Hinweise vollständig |
-| 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | ✅ `.github/workflows/pages.yml`, alle 4 Vorgaben umgesetzt, 2 Wächter mit Gegentest |
-| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | offen — **erster Schritt ist jetzt ein Probelauf auf `website-migration`** (AP 7.0) |
+| 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | ✅ `.github/workflows/pages.yml`, alle 4 Vorgaben umgesetzt, 2 Wächter mit Gegentest, **auf GitHub 2× grün gelaufen** |
+| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | AP 7.0 ✅ (Probelauf grün), ab 7.1 offen — der Merge nach `main` deployt |
 | 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h | offen |
 
 > **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
@@ -918,7 +949,7 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] Bestehendes Repo angebunden, Branch `website-migration`, Modelldaten nach `model/`
 - [x] Website-Quellcode committet (ohne `assets/`), `exclude:` gesetzt
 - [x] `gh` installiert
-- [ ] `gh auth login` ausgeführt
+- [x] `gh auth login` ausgeführt (Konto `culturalheritagedigital`, Scopes u. a. `repo`, `workflow`)
 - [ ] Ionos-Vertragsdaten/Zugänge gesichert
 - [x] `_gallery_fancy.md` und `_about_us.md` (tote Entwürfe) gelöscht
 - [x] 340 verwaiste Assets (708 MB) entfernt, alle 11 Videos gelöscht
@@ -952,8 +983,10 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [ ] **Entscheidung offen:** Klick-zum-Laden für die vier Sketchfab-Einbindungen statt Direktladen (~1 h)
 - [x] `.github/workflows/pages.yml` angelegt: Build (`JEKYLL_ENV=production`) → html-proofer → 2 Wächter → Deploy nur von `main`
 - [x] Wächter 1 (`(src|href)="/assets/` = 0) und Wächter 2 (kein `<img>` ohne `width`/`height`) lokal grün **und** per Gegentest auf Ansprechen geprüft
-- [ ] **Settings → Pages → Source: „GitHub Actions"** im Repo gesetzt (interaktiv, sonst scheitert der Deploy-Job)
-- [ ] Probelauf: `website-migration` gepusht, Workflow grün — **vor** dem Merge nach `main` (AP 7.0)
+- [x] **Settings → Pages → Source: „GitHub Actions"** im Repo gesetzt (`build_type: workflow` bestätigt)
+- [x] Vor dem ersten Push: gesamte Historie auf `logs/`, `.htaccess`, Rohlogs, Keys geprüft — 0 Treffer; einzige echte IP ist die Ionos-Server-IP in diesem Dokument
+- [x] Probelauf AP 7.0: `website-migration` gepusht, Workflow **2× grün** (`30525990144`, `30526171441`), Deploy korrekt übersprungen
+- [x] Auf dem Runner belegt: `_plugins/` greift (181/181 `<img>` mit Maßen), Lockdatei nicht nachgelöst, 0 Annotationen nach dem Action-Bump
 - [ ] GitHub-Actions-Workflow deployt, htmlproofer meldet 0 tote interne Links
 - [ ] Site unter `culturalheritagedigital.github.io/Cindymill/` vollständig durchgeklickt
 - [ ] `README.md` neu gefasst (Website + `model/`, Link auf die Pages-URL)
