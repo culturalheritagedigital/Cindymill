@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 30.07.2026 (Rev. 10 — AP 0–6 ausgeführt; AP 7.0 und 7.3-Readmes vorgezogen, Branch gepusht, CI 3× grün)
+**Stand:** 30.07.2026 (Rev. 11 — AP 0–6 ausgeführt, AP 7.1/7.2/7.3-Readmes erledigt. **Die Site ist live:** https://culturalheritagedigital.github.io/Cindymill/)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -869,14 +869,54 @@ Die vorletzte Zeile ist der eigentliche Gewinn dieses Laufs: **`_plugins/image_a
 Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 
 0. ✅ **Erledigt (30.07.2026).** `gh auth login`, **Settings → Pages → Source: „GitHub Actions"**, Vorab-Kontrolle auf personenbezogene Daten, Push von `website-migration`. Der Workflow lief dort zweimal komplett durch — Build, html-proofer, beide Wächter — **ohne** zu deployen. Details im Nachtrag zu AP 6. Der Livegang ist damit nicht mehr zugleich der erste CI-Lauf.
-1. Branch `website-migration` nach `main` mergen und pushen, Workflow deployt → Site läuft unter `https://culturalheritagedigital.github.io/Cindymill/`.
-2. **Vollständig durchklicken:** alle 27 Seiten, Galerie, beide CAD-Downloads, Blog-Paginierung, `atom.xml`, `404`. HTTPS ist über das `*.github.io`-Wildcard-Zertifikat automatisch aktiv — nichts zu konfigurieren.
+1. ✅ **Erledigt (30.07.2026).** Merge nach `main`, Push, Deployment — siehe Ergebnisbericht unten. **Die Site ist live.**
+2. ✅ **Maschinell geprüft (30.07.2026)** — siehe Ergebnisbericht. Der visuelle Durchgang durch die Seiten bleibt dem Betreiber; alles maschinell Prüfbare ist grün.
 3. **Externe Verweise auf die alte Domain umbiegen**, solange sie noch erreichbar ist:
    - ✅ `README.md` im Repo-Root — neu gefasst, siehe unten.
    - ✅ die drei `Readme.md` unter `model/` (aus AP 5 hierher gegeben) — siehe unten.
-   - ⬜ das „Website"-Feld in den Repo-Einstellungen. **Korrektur:** Es zeigt *nicht* auf `www.cindymill.xyz`, sondern ist **leer** (`gh api …/Cindymill --jq .homepage` → `null`). Zu setzen ist es trotzdem — sinnvollerweise erst nach AP 7.1, wenn die Pages-URL wirklich antwortet.
+   - ⬜ das „Website"-Feld in den Repo-Einstellungen. **Korrektur:** Es zeigt *nicht* auf `www.cindymill.xyz`, sondern ist **leer** (`gh api …/Cindymill --jq .homepage` → `null`). Seit dem Deployment ist die Pages-URL gültig, das Feld kann gesetzt werden.
    - ⬜ eigene Profile, Foren-Signaturen, YouTube-Beschreibungen, Thingiverse/Printables-Einträge
    - ⬜ der Zenodo-DOI-Eintrag (`10.5281/zenodo.5118794`) verweist auf das Repo — Metadaten prüfen. Der Eintrag ist live (`status: published`, Titel „culturalheritagedigital/Cindymill: Cindymill DIY open source CNC milling machine"); die 403 beim reinen `curl`-Abruf ist Bot-Abwehr, kein toter Link.
+
+#### Ergebnis AP 7.1 und 7.2 — Livegang (30.07.2026), Merge-Commit `edd7de9`
+
+**Die Website läuft unter `https://culturalheritagedigital.github.io/Cindymill/`.**
+
+Vor dem Merge geprüft: Arbeitsbaum sauber, nichts Ungepushtes, `main` **0 Commits** vor dem Branch (Fast-Forward wäre möglich gewesen) — und der grüne CI-Lauf `30526932138` sitzt exakt auf dem Branch-HEAD `be54fac`, nicht auf einem älteren Stand.
+
+Gemergt wurde trotzdem mit **`--no-ff`**: der Merge-Commit gibt einen einzigen Punkt, den `git revert -m 1 edd7de9` in einem Schritt zurückdreht. Bei einem Fast-Forward wären es 19 einzelne Reverts. Nach dem Merge gegengeprüft: `git diff main website-migration` ist leer, im Baum liegen keine Server-Artefakte.
+
+**Deployment-Lauf `30527607219`: `build` 36 s ✅ → `deploy` 10 s ✅.** Das war der erste Lauf des `deploy`-Jobs überhaupt — der einzige Baustein des Workflows, der bis dahin nie ausgeführt worden war.
+
+**Die vier Ionos-Defekte aus Abschnitt 1.1 sind erledigt**, gemessen an der Live-Antwort:
+
+| Merkmal | Ionos (Abschnitt 1.1) | jetzt |
+|---|---|---|
+| Protokoll | nur HTTP/1.1 | **HTTP/2** |
+| Kompression | keine | `content-encoding: gzip` |
+| Caching | keine Header | `cache-control: max-age=600` + `expires` |
+| HTTPS | **defekt** (TLS-Handshake bricht bei SNI ab) | gültig: `CN=*.github.io`, Let's Encrypt, dazu `strict-transport-security` |
+
+**Prüfung gegen die Live-Site (AP 7.2).** Nicht gegen `_site/`, sondern gegen das, was der Server wirklich ausliefert:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Alle **27** gebauten Seiten einzeln abgerufen | **27× 200**, 0 Fehler |
+| `sitemap.xml`, `robots.txt`, `atom.xml`, `site.webmanifest` | alle 200, korrekte Content-Types |
+| Nicht existierende URL | 404 mit der eigenen `404.html` |
+| **Jedes Bild auf `gallery.html`** einzeln abgerufen | **53 Bilder, 0 kaputt** |
+| Beide CAD-Downloads | abrufbar (21 MB + 1 MB) |
+| Schrift, Stylesheet, Badge | 200, `font/woff2`, `text/css`, `image/svg+xml` |
+| Tracking im ausgelieferten HTML (9 Seiten) | **0 Treffer** für beide GA-IDs, `googletagmanager`, `google-analytics` |
+| Mixed Content / `cdn.mathjax.org` | **0 Treffer** |
+| Asset-Pfade **ohne** `/Cindymill`-Präfix (Befund D/Q) | **0 Treffer** |
+| Backslash-Pfade `assets%5C` (Befund A) | **0 Treffer** |
+| Ladende Fremdserver | nur **`sketchfab.com`** — wie in Abschnitt 5 der Datenschutzerklärung beschrieben |
+| `<img>` ohne `width`/`height` | 0 von 99 auf den geprüften Seiten |
+
+Die Zeile **„53 Bilder, 0 kaputt"** ist das eigentliche Ergebnis dieses Umzugs. Befund A — die komplette Galerie über URL-kodierte Windows-Backslashes tot — war der schwerwiegendste inhaltliche Defekt der alten Seite und bestand dort rund 3,8 Jahre.
+
+> **Der visuelle Durchgang bleibt offen und sinnvoll.** Alles Geprüfte oben ist maschinell: Statuscodes, Header, Zeichenketten. Ob die Galerie *aussieht* wie gedacht, ob die Bildqualität nach der Optimierung in AP 1.5 trägt und ob die Blog-Paginierung sich richtig anfühlt, sagt kein `curl`. Dafür ist ein Durchklicken durch die 27 Seiten weiterhin angeraten.
 
 #### Ergebnis AP 7.3 — Readme-Dateien (30.07.2026), Commit `c3ba058`
 
@@ -940,7 +980,7 @@ Beide 404-Ziele existieren im gebauten `_site/` (`index.html`, `accessories.html
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | ✅ SEO-Metadaten gültig, kein Tracking, Schrift self-hosted, Bildmaße im Build |
 | 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | ✅ Analytics- und LinkedIn-Abschnitt raus, Hosting = GitHub, Badges lokal, Affiliate-Hinweise vollständig |
 | 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | ✅ `.github/workflows/pages.yml`, alle 4 Vorgaben umgesetzt, 2 Wächter mit Gegentest, **auf GitHub 2× grün gelaufen** |
-| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | AP 7.0 ✅ (Probelauf grün), 7.3-Readmes ✅; offen: 7.1 Merge/Deploy, Repo-Website-Feld, Zenodo, Kündigung |
+| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | ✅ **Site ist live** (7.0–7.2, Readmes); offen: Repo-Website-Feld, Zenodo, Profile, Ionos-Kündigung |
 | 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h | offen |
 
 > **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
@@ -1024,8 +1064,12 @@ Beide 404-Ziele existieren im gebauten `_site/` (`index.html`, `accessories.html
 - [x] Vor dem ersten Push: gesamte Historie auf `logs/`, `.htaccess`, Rohlogs, Keys geprüft — 0 Treffer; einzige echte IP ist die Ionos-Server-IP in diesem Dokument
 - [x] Probelauf AP 7.0: `website-migration` gepusht, Workflow **2× grün** (`30525990144`, `30526171441`), Deploy korrekt übersprungen
 - [x] Auf dem Runner belegt: `_plugins/` greift (181/181 `<img>` mit Maßen), Lockdatei nicht nachgelöst, 0 Annotationen nach dem Action-Bump
-- [ ] GitHub-Actions-Workflow deployt, htmlproofer meldet 0 tote interne Links
-- [ ] Site unter `culturalheritagedigital.github.io/Cindymill/` vollständig durchgeklickt
+- [x] GitHub-Actions-Workflow deployt (`30527607219`: build 36 s, deploy 10 s), htmlproofer meldet 0 tote interne Links
+- [x] Merge nach `main` als `--no-ff` (Commit `edd7de9`) — in einem Schritt zurückdrehbar
+- [x] Live geprüft: 27/27 Seiten 200, **53/53 Galeriebilder**, beide CAD-Downloads, `atom.xml`/`sitemap.xml`/`robots.txt`, eigenes 404
+- [x] Live gegengeprüft: 0 Tracking, 0 Mixed Content, 0 Asset-Pfade ohne `baseurl`, 0 Backslash-Pfade, einziger ladender Fremdserver ist `sketchfab.com`
+- [x] HTTP/2, gzip, `cache-control`, gültiges Let's-Encrypt-Zertifikat + HSTS — alle vier Ionos-Defekte aus Abschnitt 1.1 erledigt
+- [ ] Site visuell durchgeklickt (Bildqualität nach der Optimierung, Galerie-Layout, Blog-Paginierung — das prüft kein `curl`)
 - [x] `README.md` neu gefasst (Website + `model/`, Pages-URL, Fork-Hinweis, `http://`-CC-Link und ungenutzte Shield-Referenz raus)
 - [ ] Externe Verweise auf cindymill.xyz umgebogen — Repo-Website-Feld (ist **leer**, nicht falsch gesetzt), Zenodo-Metadaten, Profile, Foren
 - [x] Die drei `Readme.md` unter `model/` umgebogen; toter `/addons`-Link auf `accessories.html` korrigiert
