@@ -1,6 +1,6 @@
 # Cindymill — Technische Modernisierung & Umzug zu GitHub Pages
 
-**Stand:** 30.07.2026 (Rev. 7 — AP 0, 1, 2, 3, 4 und 5 ausgeführt)
+**Stand:** 30.07.2026 (Rev. 8 — AP 0, 1, 2, 3, 4, 5 und 6 ausgeführt)
 **Arbeitsordner (Jekyll-Quellcode):** `/Users/nikoplath/Code/2026_Website_Cindymill`
 **Backup des Ionos-Servers:** `/Users/nikoplath/Code/2026_Backup_Website_Cindymill_Ionos` (FTP-Spiegel inkl. `logs/`, 995 MB)
 
@@ -309,7 +309,7 @@ Das hat drei Konsequenzen, die im weiteren Plan berücksichtigt sind:
 
 1. **`baseurl: "/Cindymill"`** — mit großem C. GitHub Pages bildet den Repo-Namen unverändert auf den Pfad ab; ein kleingeschriebenes `/cindymill` liefert 404.
 2. **Die Modelldaten liegen jetzt unter `model/`.** Bestehende Links auf CAD-Dateien (Forks, Foren, das alte README) zeigen ins Leere und müssen umgebogen werden, soweit sie in eigener Hand sind. Die 14 Forks behalten die alte Struktur — das ist unvermeidbar.
-3. **Der Repo-Root ist die Jekyll-Wurzel.** Alles, was nicht zur Website gehört (`model/`, `README.md`, `LICENSE`, `cindymill_front_1.jpg`, die Projektdoku), muss in `_config.yml` unter `exclude:` stehen, sonst landet es im Build und im Pages-Deployment.
+3. **Der Repo-Root ist die Jekyll-Wurzel.** Alles, was nicht zur Website gehört (`model/`, `README.md`, `LICENSE`, `cindymill_front_1.jpg`, die Projektdoku), muss in `_config.yml` unter `exclude:` stehen, sonst landet es im Build und im Pages-Deployment. Ausgenommen sind Namen, die mit `.` beginnen: `.github/` überspringt Jekyll von sich aus — in AP 6 gegen den Build geprüft, nicht unterstellt.
 
 ---
 
@@ -749,7 +749,7 @@ Zusätzlich, weil html-proofer für diese Fragen blind ist:
 - an **AP 7.3**: die drei `Readme.md` unter `model/` verlinken noch `http://www.cindymill.xyz` (`model/Tools/`, `model/Accessories/`, `model/10mm_Milled_Aluminum_Version/Spacers/`). Sie sind vom Build ausgeschlossen, gehören aber zu den eigenen Verweisen, die vor der Kündigung umzubiegen sind. In `model/Accessories/Readme.md` zeigt der Link zusätzlich auf `/addons`, während der Linktext `/accessories` sagt.
 - an **AP 8.4**: in `_posts/2021-08-01-SpeedsAndFeeds.md` zeigt der Link „join our facebook group!" auf `/parts/electronic_parts/` statt auf die Facebook-Gruppe, ein zweiter Link im selben Absatz („Here is a list of cutters I use.") auf dasselbe Ziel. Vorbestehend seit dem ersten Commit (`74e6bbf`), also **nicht** von AP 2 verursacht — nachgeprüft. Inhaltsfehler wie Befund J, aber ohne die dort vorhandene eindeutige Konvention: welches Ziel gemeint war, muss der Autor entscheiden.
 
-### AP 6 — GitHub-Actions-Workflow
+### AP 6 — GitHub-Actions-Workflow ✅ ausgeführt (30.07.2026)
 
 `.github/workflows/pages.yml`:
 
@@ -771,10 +771,73 @@ Zusätzlich, weil html-proofer für diese Fragen blind ist:
 
    Beides sind Einzeiler und decken genau die zwei Fehlerklassen ab, die dieser Umzug als „lokal unsichtbar" kennengelernt hat.
 
+#### Ergebnis AP 6 (30.07.2026) — Commit `dcb2fe4`
+
+Eine neue Datei: `.github/workflows/pages.yml` (110 Zeilen). Zwei Jobs, sieben Schritte.
+
+| # | Vorgabe aus dem Plan | Ergebnis |
+|---|---|---|
+| 1 | `--swap-urls '^/Cindymill/:/'` an html-proofer | ✅ gesetzt, kein `--baseurl` am Build |
+| 2 | kein `--safe`, kein klassischer Pages-Build | ✅ nur `bundle exec jekyll build`; **Wächter 2** belegt es messbar |
+| 3 | Abbruch über den Exit-Code, nicht über die Ausgabe | ✅ ergibt sich aus `bash -e` der `run:`-Schritte — die Ausgabe wird nirgends ausgewertet |
+| 4 | zwei stumpfe `grep`-Prüfungen | ✅ als eigene Schritte „Wächter 1/2", mit `::error::`-Meldung statt nacktem Exit-Code |
+
+**Job `build`** (`ubuntu-latest`): `actions/checkout@v4` → `ruby/setup-ruby@v1` (`bundler-cache: true`) → Build → html-proofer → Wächter 1 → Wächter 2 → `actions/upload-pages-artifact@v3`.
+**Job `deploy`**: `actions/deploy-pages@v4`, `permissions: pages: write, id-token: write`, Environment `github-pages`.
+`JEKYLL_ENV: production` steht auf Workflow-Ebene und gilt damit auch für den html-proofer-Lauf — geprüft wird genau der Build, der ausgeliefert wird.
+
+**Abweichung 1: der Trigger ist weiter gefasst als geplant.** Der Plan sah `push` auf `main` + `workflow_dispatch` vor. Umgesetzt ist zusätzlich `push` auf `website-migration` und `pull_request`; der Job `deploy` ist auf `github.ref == 'refs/heads/main'` gekoppelt und läuft dort nicht mit.
+
+Der Grund steht in AP 7.1: Dort wird `website-migration` nach `main` gemergt und **derselbe Merge löst das erste Deployment aus**. Mit dem geplanten Trigger wäre der erste CI-Lauf dieses Projekts zugleich der Livegang gewesen — bei einem Umzug, dessen unangenehmste Funde (Befund K, Befund M) genau die Klasse „fällt erst im CI auf" hatten. Jetzt lässt sich der Workflow auf dem Migrationsbranch trockenlaufen lassen, bevor `main` angefasst wird.
+
+**Abweichung 2: Wächter 2 zählt schärfer als vorgeschlagen.** Der Plan schlug `grep -c 'width=' _site/index.html` vor. Das ist als Wächter untauglich: `width=` steht im Build 518× — überwiegend in den Inline-SVG-Icons des Themes, nicht an `<img>`. Ein Ausfall des Plugins hätte den Zähler also nur gesenkt, nicht auf null gebracht, und jede Erwartungszahl im Workflow veraltet beim ersten neuen Bild. Stattdessen prüft der Schritt eine Invariante:
+
+```bash
+total=$(grep -rohE '<img[^>]*>' _site --include='*.html' | wc -l)
+bad=$(  … | grep -cvE 'width="[^"]+".*height="[^"]+"|height="[^"]+".*width="[^"]+"')
+# Abbruch bei total == 0 oder bad != 0
+```
+
+Also: **kein `<img>` ohne beides**. Die Alternation deckt beide Attributreihenfolgen ab; `total == 0` fängt den Fall ab, dass der Build gar nichts erzeugt hat und die Prüfung deshalb trivial bestünde.
+
+**Nicht verwendet: `actions/configure-pages`.** Die Aktion wird in GitHubs Jekyll-Vorlage mitgeliefert, um `baseurl` zur Laufzeit zu setzen. Hier steht `baseurl` seit AP 4 fest in `_config.yml`, und alle Prüfungen (html-proofer-`--swap-urls`, Wächter 1) sind auf genau diesen Wert geeicht. Eine zweite Quelle für dieselbe Einstellung wäre ein stiller Widerspruch — weggelassen.
+
+**Ruby-Version kommt aus `.ruby-version`** (`ruby-version: '.ruby-version'`), nicht als zweite Zahl im Workflow. Damit bleibt AP 3.3 („lokaler Build und CI identisch") auch dann wahr, wenn die Datei einmal geändert wird.
+
+> **Korrektur zu AP 3.1.** Dort steht, `Gemfile.lock` sei „neu aufgelöst, `arm64-darwin`/`ruby`". Tatsächlich enthält die Datei **zehn** Plattformen, darunter `x86_64-linux-gnu` — Bundler 2.6 löst standardmäßig für alle gängigen auf. Nachgesehen, weil ein fehlender Linux-Eintrag den CI-Build entweder zum Nachlösen gezwungen (und die Lockdatei im Lauf verändert) oder ihn unter `frozen` abgebrochen hätte. Es war nichts zu tun; `bundle lock --add-platform x86_64-linux` ist **nicht** nötig.
+
+**`.github/` braucht keinen `exclude:`-Eintrag** — im Gegensatz zur Regel aus Abschnitt 2 („bei jedem neuen Root-Element nachziehen"). Jekyll überspringt Einträge, die mit `.` beginnen, grundsätzlich. Gegen den Build geprüft statt unterstellt: nach `jekyll build` liegt kein `.github` in `_site/`. Ebenso geprüft, dass `.gitignore` die Datei nicht verschluckt (`git check-ignore -v` → kein Treffer) — dieselbe Falle wie Befund K.
+
+**Verifikation.** Alles, was ohne GitHub prüfbar ist, wurde lokal gegen den Produktionsbuild ausgeführt:
+
+```
+JEKYLL_ENV=production bundle exec jekyll build   → 27 Seiten
+bundle exec htmlproofer ./_site --disable-external --swap-urls '^/Cindymill/:/'
+  → 27 Dateien, finished successfully, Exit-Code 0
+Wächter 1: grep -rE '(src|href)="/assets/' _site   → 0 Treffer
+Wächter 2: 181 <img> im Build, davon 0 ohne width/height
+YAML-Syntax:  geparst, jobs = build, deploy
+```
+
+Und weil „0 Fehler" allein nichts beweist (die Lehre aus Befund M), beide Wächter mit einem Gegentest auf Ansprechen geprüft:
+
+| Wächter | Gegentest | Ergebnis |
+|---|---|---|
+| 1 | Datei mit `<a href="/assets/x">` | greift, Treffer wird mit Zeilennummer ausgegeben |
+| 2 | `<img src="x.jpg" alt="">` ohne Maße | greift, `bad` = 1 → Abbruch |
+
+> ⚠️ **Was lokal nicht prüfbar ist.** Ob `ruby/setup-ruby` mit `bundler-cache: true` auf `ubuntu-latest` durchläuft, ob das Artefakt korrekt hochgeladen wird und ob `deploy-pages` das Environment bekommt, zeigt erst der erste echte Lauf. Der ist mit dem erweiterten Trigger aber **nicht** mehr an den Livegang gekoppelt: ein Push von `website-migration` löst Build und Prüfung ohne Deployment aus. Genau so ist er in AP 7 einzuplanen.
+
+**Offen aus AP 6 — beides erfordert interaktive Anmeldung und kann hier nicht ausgeführt werden:**
+
+1. `gh auth login` (steht schon als AP 0.10 offen) — Voraussetzung für den ersten Push.
+2. **Settings → Pages → Source: „GitHub Actions"** im Repository umstellen. Ohne diese Einstellung schlägt der Job `deploy` fehl (`deploy-pages` findet kein Pages-Environment) — der Job `build` samt aller Prüfungen läuft davon unabhängig durch.
+
 ### AP 7 — Livegang und Ionos-Kündigung (Reihenfolge einhalten!)
 
 Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 
+0. **Vorher, seit AP 6 möglich:** `gh auth login`, dann **Settings → Pages → Source: „GitHub Actions"** setzen und `website-migration` pushen. Der Workflow läuft dort komplett durch — Build, html-proofer, beide Wächter — **ohne** zu deployen. Erst wenn dieser Lauf grün ist, weiter mit Schritt 1. Damit ist der Livegang nicht mehr zugleich der erste CI-Lauf.
 1. Branch `website-migration` nach `main` mergen und pushen, Workflow deployt → Site läuft unter `https://culturalheritagedigital.github.io/Cindymill/`.
 2. **Vollständig durchklicken:** alle 27 Seiten, Galerie, beide CAD-Downloads, Blog-Paginierung, `atom.xml`, `404`. HTTPS ist über das `*.github.io`-Wildcard-Zertifikat automatisch aktiv — nichts zu konfigurieren.
 3. **Externe Verweise auf die alte Domain umbiegen**, solange sie noch erreichbar ist:
@@ -808,11 +871,13 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | 3 | Toolchain (Jekyll 4.4, sass-embedded, Theme vendorn) | 0 | 3–4 h | ✅ Build läuft, html-proofer 0 Fehler |
 | 4 | `_config.yml` + `head.html` modernisieren | 3 | 2–3 h | ✅ SEO-Metadaten gültig, kein Tracking, Schrift self-hosted, Bildmaße im Build |
 | 5 | Datenschutz/Rechtstexte | 4 | 1–2 h | ✅ Analytics- und LinkedIn-Abschnitt raus, Hosting = GitHub, Badges lokal, Affiliate-Hinweise vollständig |
-| 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | offen |
-| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | offen |
+| 6 | GitHub-Actions-Workflow | 2–4 | 1–2 h | ✅ `.github/workflows/pages.yml`, alle 4 Vorgaben umgesetzt, 2 Wächter mit Gegentest |
+| 7 | Livegang, externe Links umbiegen, Ionos kündigen | 6 | 1–2 h | offen — **erster Schritt ist jetzt ein Probelauf auf `website-migration`** (AP 7.0) |
 | 8 | Nacharbeiten, SEO, Linkpflege | 7 | 2–4 h | offen |
 
 > **`assets/` wird erst nach AP 1 committet.** Wer die 708 MB verwaister Assets erst committet und dann löscht, trägt sie dauerhaft in der Git-History mit — jeder Clone und jeder der 14 Forks zieht sie. Das Backup ist der Rollback-Punkt.
+
+**AP 6 hat die Reihenfolge um einen Schritt ergänzt.** Der Workflow prüft jetzt auch auf `website-migration` und in Pull Requests, deployt aber nur von `main`. Dadurch lässt sich der CI-Lauf einmal trocken durchspielen, bevor der Merge in AP 7.1 ihn zum Livegang macht — das ist der neue Schritt **AP 7.0**. Zwei Dinge bleiben aus AP 6 offen, weil sie interaktive Anmeldung verlangen: `gh auth login` und die Repo-Einstellung **Settings → Pages → Source: GitHub Actions**. Ohne die zweite scheitert nur der Deploy-Job; Build und Prüfungen laufen davon unabhängig.
 
 **AP 5 hat die Reihenfolge ebenfalls nicht verschoben**, aber eine Entscheidung offen gelassen, die kein Blocker ist: Klick-zum-Laden für die vier Sketchfab-Einbindungen (Befund N). Sie kann vor oder nach dem Livegang getroffen werden; die Datenschutzerklärung ist in beiden Fällen korrekt, im zweiten Fall nur knapper. Fällt sie für Klick-zum-Laden aus, ist Abschnitt 5 der Erklärung entsprechend zu kürzen.
 
@@ -833,11 +898,11 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 | ~~Jekyll 4.2 → 4.4 bricht das Theme~~ | ✅ **erledigt** | Eingetreten ist nur, was erwartet war: Sass-Deprecations, keine Fehler. Build und html-proofer laufen durch. |
 | ~~Sass-Build scheitert auf Ruby 3.4~~ | ✅ **erledigt** | `jekyll-sass-converter 3.1.0` mit `sass-embedded` — `sassc` ist raus. |
 | Dart Sass 3.0 entfernt `@import` und Slash-Division | mittel, aber nicht akut | Das vendorte Theme nutzt beides. In AP 3 bewusst nur stummgeschaltet (`quiet_deps`) statt migriert. Schutz: `jekyll-sass-converter ~> 3.0` verlangt `sass-embedded < 2.0`, der Bruch kann nicht per `bundle update` einziehen. Fällig wird die Migration erst, wenn eine neue Converter-Generation erscheint — dann via `sass-migrator`. |
-| **Eigenes Plugin wird von einer anderen Build-Umgebung ignoriert** | mittel, aber unsichtbar | `_plugins/image_attributes.rb` (AP 4) läuft nur beim Actions-Build. Der klassische Pages-Build und `--safe` überspringen es **ohne Fehlermeldung**: die Seite baut, sieht fast gleich aus, hat aber keine Bildmaße und kein Lazy-Loading mehr. Gegenmaßnahme: Vorgaben in AP 6 einhalten; als Dauerkontrolle taugt eine Zeile im Workflow, die `width=` im Build zählt. |
+| **Eigenes Plugin wird von einer anderen Build-Umgebung ignoriert** | ✅ **abgesichert** (Restrisiko niedrig) | `_plugins/image_attributes.rb` (AP 4) läuft nur beim Actions-Build. Der klassische Pages-Build und `--safe` überspringen es **ohne Fehlermeldung**: die Seite baut, sieht fast gleich aus, hat aber keine Bildmaße und kein Lazy-Loading mehr. Seit AP 6 bricht der Workflow ab, sobald auch nur ein `<img>` ohne `width`/`height` im Build steht (Wächter 2) — ein stiller Ausfall ist damit ausgeschlossen. |
 | ~~Prüflauf meldet Erfolg, obwohl er Fehler gefunden hat~~ | ✅ **geklärt** | Befund M: Der AP-3-Bericht schrieb „0 Fehler", tatsächlich waren es 4. Ursache war die Auswertung der Ausgabe statt des Exit-Codes. Behoben, Exit-Code-Verhalten in AP 4 gegengeprüft, als Vorgabe in AP 6 verankert. |
 | `.gitignore`-Muster greifen tiefer als gedacht | niedrig, aber unsichtbar | Befund K: `vendor/` hätte 38 Theme-Dateien verschluckt, sichtbar erst im CI. Behoben. **Regel für künftige Einträge:** Werkzeug-Ordner auf den Root verankern (`/vendor/`), Sicherheitsmuster (`logs/`, `*.log`, `.htaccess`) absichtlich nicht. Neue Einträge mit `git check-ignore -v` gegenprüfen. |
 | **Sketchfab-iframes übertragen die Besucher-IP in die USA** | mittel, bewusst getragen | Befund N. Vier Anleitungsseiten binden 3D-Modelle per iframe ein; entfernen hieße Inhalt entfernen. In AP 5 vollständig offengelegt (Abschnitt 5 der Datenschutzerklärung, mit Nennung der betroffenen Seiten). Restrisiko bleibt: Aufsichtsbehörden verlangen für solche Einbindungen zunehmend eine Einwilligung. Härtere Option ist dokumentiert (Klick-zum-Laden, ~1 h). |
-| **Prüfwerkzeug ist für die eigene Kernfrage blind** | mittel, unsichtbar | Befund Q: html-proofer löst `src="/assets/…"` gegen die `_site`-Wurzel auf und meldet einen fehlenden `baseurl` deshalb **nicht** — obwohl genau das der Blocker aus Befund D war. Gegenmaßnahme: zusätzlich stumpf nach `(src\|href)="/assets/` im Build suchen. Gehört als Zeile in den Workflow (AP 6). |
+| **Prüfwerkzeug ist für die eigene Kernfrage blind** | ✅ **abgesichert** (Restrisiko niedrig) | Befund Q: html-proofer löst `src="/assets/…"` gegen die `_site`-Wurzel auf und meldet einen fehlenden `baseurl` deshalb **nicht** — obwohl genau das der Blocker aus Befund D war. Seit AP 6 sucht der Workflow zusätzlich stumpf nach `(src\|href)="/assets/` im Build (Wächter 1) und bricht bei jedem Treffer ab. |
 | Bild-Optimierung zerstört Bildqualität | niedrig | Originale liegen im Backup (nicht im Repo), Stichproben visuell prüfen |
 | Personenbezogene Daten im öffentlichen Repo | niedrig, aber gravierend | `logs/` liegt bereits nur im Backup; vor dem ersten Push manuell prüfen und Git-History kontrollieren |
 | Kündigung vor funktionierendem Ersatz | niedrig | Reihenfolge in AP 7 strikt einhalten: erst Site live und geprüft, dann kündigen |
@@ -885,6 +950,10 @@ Ohne eigene Domain entfällt der gesamte DNS-Teil. Es bleibt:
 - [x] Affiliate-Kennzeichnung: 4 von 8 Seiten hatten keine, ergänzt — 8/8 im Build gegengeprüft
 - [x] Keine Fremdserver-Bilder, -Skripte oder -Schriften mehr im Build; verbleibend: 4 Sketchfab-iframes (Befund N)
 - [ ] **Entscheidung offen:** Klick-zum-Laden für die vier Sketchfab-Einbindungen statt Direktladen (~1 h)
+- [x] `.github/workflows/pages.yml` angelegt: Build (`JEKYLL_ENV=production`) → html-proofer → 2 Wächter → Deploy nur von `main`
+- [x] Wächter 1 (`(src|href)="/assets/` = 0) und Wächter 2 (kein `<img>` ohne `width`/`height`) lokal grün **und** per Gegentest auf Ansprechen geprüft
+- [ ] **Settings → Pages → Source: „GitHub Actions"** im Repo gesetzt (interaktiv, sonst scheitert der Deploy-Job)
+- [ ] Probelauf: `website-migration` gepusht, Workflow grün — **vor** dem Merge nach `main` (AP 7.0)
 - [ ] GitHub-Actions-Workflow deployt, htmlproofer meldet 0 tote interne Links
 - [ ] Site unter `culturalheritagedigital.github.io/Cindymill/` vollständig durchgeklickt
 - [ ] `README.md` neu gefasst (Website + `model/`, Link auf die Pages-URL)
